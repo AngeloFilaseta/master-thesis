@@ -1,0 +1,32 @@
+\chapter{Kotlin Multiplatform}
+\section{Kotlin Multiplatform}
+\label{sec:kotlin-multiplatform}
+One of the main advantages of Kotlin is its support for multiplatform programming.
+It helps keeping the flexibility and advantages of native programming while cutting down on
+the effort spent writing and maintaining the same code for several platforms.
+
+\centerImage{
+	figures/kotlin-multiplatform.png
+}{
+	Kotlin Multiplatform - Supported Platforms
+}{
+	kotlin-mp
+}{
+	0.5
+}
+
+\begin{itemize}
+	\item The language, basic tools, and core libraries are all part of \emph{Common Kotlin}. Common Kotlin code runs on all systems and is portable.
+	\item It is possible to use Kotlin platform-specific versions for platform interoperability. Extensions to the Kotlin language as well as platform-specific libraries and tools are included in the \emph{Kotlin/JVM}, \emph{Kotlin/JS}, and \emph{Kotlin/Native} platform-specific versions of the language.
+	Through these platforms it is possible to access the platform native code (JVM, JS, and Native) and utilizing all the native features.
+\end{itemize}
+
+Kotlin Multiplatform may have many applications, but the following are some of the most prevalent ones:
+
+\begin{itemize}
+	\item Create Android, iOS, and web apps. By using shared code, the amount of business logic that frontend developers have to create is decreased.
+	This improves the efficiency of product implementation while requiring less coding and testing for the specific platform.
+	\item Create of a multiplatform library.
+	Using shared code and platform-specific components if needed, a multiplatform library that has been distributed may become a classic dependency.
+	\item Building a full-stack web app. The two main targets are Kotlin/JVM (for the server) and Kotlin/JS (for the client). The shared code, mainly constints in the model of the application, but can also contains common logic that may run on both the server and the client.
+\end{itemize}
