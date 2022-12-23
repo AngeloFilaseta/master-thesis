@@ -1,0 +1,79 @@
+\section{Serialization}
+\label{sec:serialization}
+Serialization is the process of transforming data that is used by an application into a format that can be sent over a network or stored in a database or a file.
+
+Deserialization, on the other hand, is the procedure that reads data from an external source and transforms it into a runtime object.
+
+In Kotlin, serialization tools are provided by a separate component called kotlinx.serialization.
+
+The library is supported by all the platforms (JVM, JavaScript, Native) and lot of serialization formats are available (JSON, CBOR, protocol buffers, etc.).
+
+In this thesis, the JSON format was chosen for the following motivations:
+\begin{itemize}
+	\item JSON is text-based, so it is easy to read and debug. This can be especially useful when working with large or complex data sets.
+	\item JSON is widely supported and has become the de facto standard for data interchange on the web.
+	\item JSON has a simple and flexible structure, which makes it easy to add or remove fields as needed. This can be useful in situations where data needs to be shared between systems that have different requirements or where the data structure may change over time.
+	\item JSON is well-documented and is a popular choice for data interchange due to its simplicity, flexibility, and widespread support.
+\end{itemize}
+Nevertheless, it is possible to change from using JSON to using a different format at any time with very few changes, as kotlinx.serialization is really versatile.
+
+\noindent Classes that can be serialized must be marked explicitly. Kotlin Serialization does not use reflections, so it is impossible to mistakenly deserialize a class that was not intended to be serializable. By including the @Serializable annotation, a class is declared to be serializable.
+
+\begin{minted}{kotlin}
+@Serializable
+data class Color(val rgb: Int)
+\end{minted}
+
+\noindent The Kotlin Serialization plugin is instructed to automatically create and connect a serializer for the class if it is marked with the @Serializable annotation. The generated serializer class will inherit from the KSerializer interface. It is possible to retrieve the instance using the .serializer() function on the class's companion object.
+
+Serializers are composed bu three pieces:
+
+\begin{itemize}
+	\item A \textbf{serialize} function that implements a SerializationStrategy. It is given a value to serialize along with an instance of Encoder. It represents a value as a series of primitives using the \textit{encodeXxx} functions of Encoder. For each of the primitive types that serialization supports, there is an \textit{encodeXxx}.
+	\item A \textbf{deserialize} function that implements a DeserializationStrategy. It takes a Decoder instance and returns a deserialized value. It makes use of the Decoder's \textit{decodeXxx} functions, which are an exact replica of Encoder's corresponding ones.
+	\item A \textbf{descriptor} property that must accurately describe what the \textit{encodeXxx} and \textit{decodeXxx} functions do. This way a format implementation knows in advance which encoding and decoding techniques the \textit{encodeXxx} and \textit{decodeXxx} functions call.
+\end{itemize}
+
+It is possible to create a custom serializer and bind it to a class. This is done with the @Serializable annotation by adding the with property value.
+\begin{minted}{kotlin}
+@Serializable(with = CustomColorSerializer::class)
+data class Color(val rgb: Int)
+\end{minted}
+
+There is crucial problem considering the available code base.
+The Alchemist Simulator is a JVM project, most of the data structures are written in Java or Kotlin and are meant to be used only inside a JVM. There are also lot of dependencies with libraries which does not support multiplatform at all.\newline
+
+\noindent It is certainly still possible to treat Alchemist data structures like third-party classes and write a custom Serializer to make the @Serializable annotation to work.
+It is still important to mention that creating custom serializers for all the data structure is not ideal for the following reasons:
+\begin{itemize}
+	\item A deep understanding of the serialization process and the underlying data structure is required. This can be difficult to learn and master.
+	\item Writing complex code to handle the details of serializing and deserializing the data is required. This can be time-consuming and error-prone.
+	\item Custom serializers may need to be updated or maintained over time as the data structure or requirements change. This also results in a lot of time consumption and possible bugs/errors.
+	\item Custom serializers may be difficult for other developers to understand and use, especially if they are not well-documented or are not designed with reuse in mind.
+\end{itemize}
+
+There's another problem in using custom serializer in this particular use case. As the original structures are written using a JVM based language, the deserialization process can only work inside a JVM. This results in a compatibility problem, as existent classes cannot be used in the current project in a Kotlin/JS context.
+It would still be possible to navigate inside the Json Object created starting from the serialized string. This approach is also not desirable because accessing a JSON object can be much more difficult and tedious compared to accessing a structured class in a programming language.
+JSON objects do not have a fixed structure or defined set of fields. This can be more cumbersome and error-prone, especially if the JSON object is large or complex, or if there is'nt familiarity with the syntax of the JSON library being used.
+
+All of these information leads to the approach that has been used.
+
+\subsubsection{Surrogates}
+\label{sssec:surrogates}
+
+\begin{minted}
+public interface Molecule extends Dependency {
+
+	/**
+	* @return the name of this {@link Molecule}
+	*/
+	String getName();
+
+}
+\end{minted}
+
+
+\begin{minted}
+@Serializable
+data class MoleculeSurrogate(val name: String)
+\end{minted}

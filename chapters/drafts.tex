@@ -30,3 +30,32 @@ Kotlin Multiplatform may have many applications, but the following are some of t
 	Using shared code and platform-specific components if needed, a multiplatform library that has been distributed may become a classic dependency.
 	\item Building a full-stack web app. The two main targets are Kotlin/JVM (for the server) and Kotlin/JS (for the client). The shared code, mainly constints in the model of the application, but can also contains common logic that may run on both the server and the client.
 \end{itemize}
+
+\section{Java/JVM to JS}
+\label{sec:java-jvm-to-js}
+\subsection{Common Drawbacks}
+\label{ssec:common-drawbacks}
+\begin{itemize}
+\item
+\end{itemize}
+
+\subsection{DoppioJVM}
+\label{ssec:doppiojvm}
+
+\paragraph{Summary}
+Doppio is a JavaScript-based runtime system that enables the execution of unaltered general-purpose apps inside the browser.
+
+Two case studies have been used to illustrate the value of Doppio:
+\begin{itemize}
+	\item An \emph{Emscripten extension with Doppio} has been created to execute unmodified C++ application in the browser with full functionality.
+	\item \emph{DoppioJVM} is an interpreter written in Typescript that runs unmodified JVM programs directly in the browser.
+\end{itemize}
+
+\paragraph{Interoperability with Javascript}
+DoppioJVM can work with the JavaScript environment in addition to running programs that are entirely written in a JVM language. JavaScript snippets can be executed by JVM programs using the \textit{eval} method that DoppioJVM exposes. This method returns a JVM String, which is the operation's return value converted to string format. A JavaScript program can also use DoppioJVM to execute a JVM program in a manner similar to how one would call Java on the command line through an API: the programmer specifies the classpath, main class, arguments, and, optionally, custom functions to reroute standard input and output.
+\paragraph{Drawbacks}
+The issue with this solution is that it has the following drawbacks:
+\begin{itemize}
+	\item When running CPU-intensive benchmarks in Google Chrome, DoppioJVM is between 24 and 42 times slower than a native JVM.
+	\item Once a JVM finishes a computation, it is not possible to re-use the already instantiated VM object. Instead, a new VM instance must be spawned. As a result, in certain situations, more time could be wasted.
+\end{itemize}
