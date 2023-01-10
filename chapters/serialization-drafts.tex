@@ -19,10 +19,11 @@ Nevertheless, it is possible to change from using JSON to using a different form
 
 \noindent Classes that can be serialized must be marked explicitly. Kotlin Serialization does not use reflections, so it is impossible to mistakenly deserialize a class that was not intended to be serializable. By including the @Serializable annotation, a class is declared to be serializable.
 
-\begin{minted}{kotlin}
-@Serializable
-data class Color(val rgb: Int)
-\end{minted}
+\lstinputlisting[
+language=Kotlin,
+caption={Serializable Class example},
+label={lst:serializable},
+]{listings/Serializable.kt}
 
 \noindent The Kotlin Serialization plugin is instructed to automatically create and connect a serializer for the class if it is marked with the @Serializable annotation. The generated serializer class will inherit from the KSerializer interface. It is possible to retrieve the instance using the .serializer() function on the class's companion object.
 
@@ -35,10 +36,12 @@ Serializers are composed bu three pieces:
 \end{itemize}
 
 It is possible to create a custom serializer and bind it to a class. This is done with the @Serializable annotation by adding the with property value.
-\begin{minted}{kotlin}
-@Serializable(with = CustomColorSerializer::class)
-data class Color(val rgb: Int)
-\end{minted}
+
+\lstinputlisting[
+language=Kotlin,
+caption={Custome Serializer example},
+label={lst:customSerializer},
+]{listings/CustomSerializer.kt}
 
 There is crucial problem considering the available code base.
 The Alchemist Simulator is a JVM project, most of the data structures are written in Java or Kotlin and are meant to be used only inside a JVM. There are also lot of dependencies with libraries which does not support multiplatform at all.\newline
@@ -60,20 +63,51 @@ All of these information leads to the approach that has been used.
 
 \subsubsection{Surrogates}
 \label{sssec:surrogates}
+The following Java class is one of the simplest Alchemist API class.
 
-\begin{minted}
-public interface Molecule extends Dependency {
+\lstinputlisting[
+language=Java,
+caption={Molecule class},
+label={lst:molecule},
+]{listings/Molecule.java}
 
-	/**
-	* @return the name of this {@link Molecule}
-	*/
-	String getName();
+In this case, the Molecule interface is defining a contract for a class to have a \textit{getName()} method that returns the name of the Molecule as a String. For now, the inheritance of the Dependency interface can be ignored.
 
-}
-\end{minted}
+In the context of serialization, a surrogate class is a class that is used to serialize and deserialize another class. It acts as a "surrogate" for the original class, handling the serialization and deserialization process on behalf of the original class.
 
+Surrogate classes are often used when the original class is not directly serializable, either because:
+\begin{itemize}
+	\item It is not marked with a serialization annotation or because
+	\item It has complex internal state that cannot be easily serialized
+	\item Third-Party Dependencies that does not support serialization are involved.
+\end{itemize}
+By using a surrogate class, it is also possible to customize the serialization process and selectively include or exclude certain fields or properties from the serialized representation of the original class.
 
-\begin{minted}
-@Serializable
-data class MoleculeSurrogate(val name: String)
-\end{minted}
+A valid surrogate class for the \textit{Molecule} class is the following:
+
+\lstinputlisting[
+language=Kotlin,
+caption={MoleculeSurrogate class},
+label={lst:moleculeSurrogate},
+]{listings/MoleculeSurrogate.kt}
+
+The process of serialization for this class is really easy.
+\lstinputlisting[
+language=Kotlin,
+caption={MoleculeSurrogate serialization},
+label={lst:serializingMoleculeSurrogate},
+]{listings/SerializingMoleculeSurrogate.kt}
+
+The remaining step is the creation of a mapping function that can translate the content from a Molecule to a MoleculeSurrogate:
+
+This is a Kotlin extension function that extends the Molecule class with a new function called \textit{toMoleculeSurrogate()}. Extension functions allow to add new functions to a class without having to inherit from the class or use any type of design pattern such as decorator.
+
+The function takes no arguments and returns an instance of the \textit{MoleculeSurrogate} class, which is initialized with the name property of the \textit{Molecule} instance that the function is being called on.
+
+\lstinputlisting[
+language=Kotlin,
+caption={MoleculeSurrogate mapping function},
+label={lst:toMoleculeSurrogate},
+]{listings/ToMoleculeSurrogate.kt}
+
+Using a surrogate class and its associated serialization and deserialization logic can be used on any platform, not just on the Java Virtual Machine (JVM).
