@@ -21,10 +21,10 @@ In order to provide some context, this chapter will briefly touch on what the Al
 		\item A “rate equation”, that combines the static rate and the value of conditions, giving back an “instantaneous rate”;
 		\item A time distribution.
 	\end{itemize}
-	A visual representation of how a Reaction work is proposed in Figure \ref{fig:alchemist-reaction}.
+	A visual representation of how a Reaction work is proposed in Figure \ref{fig:alchemist-reaction};
 	\centerImage{figures/reaction.png}{Alchemist Behavior in Terms of Reactions~\cite{TheAlche16:online}}{alchemist-reaction}{0.8}
 	\item \textbf{Condition}: A function that returns a boolean and a number starting from an \textit{Environment}. If the condition does not hold (i.e., its current output is false), the reaction to which it is associated cannot run.
-	The outputted number may or may not influence the reaction speed, depending on the reaction and its time distribution.
+	The outputted number may or may not influence the reaction speed, depending on the reaction and its time distribution;
 	\item \textbf{Action}: Models a change in the \textbf{Environment}.
 \end{itemize}
 Figure \ref{fig:alchemist-metamodel} depicts a visual representation of the model described.
@@ -34,9 +34,9 @@ Figure \ref{fig:alchemist-metamodel} depicts a visual representation of the mode
 \paragraph{Incarnations} The names in the metamodel are modeled after classical chemical words. This is primarily due to Alchemist's origins as a chemical-oriented multi-compartment stochastic simulation engine capable of supporting compartment (node) mobility while maintaining good performance. Alchemist's capabilities are not restricted to this. While in chemistry, Molecule and Concentration have highly specific definitions, in Alchemist, their concept can be generalized. An \textit{Incarnation} in Alchemist includes a type definition of concentration and possibly a set of specific conditions, actions and, possibly but rarely, environments and reactions that operate on such types. In other words, an Incarnation is a concrete instance of the Alchemist metamodel.\newline
 Different \textit{Incarnations} can represent vastly different universes. By now, Alchemist supports the following Incarnations:
 \begin{itemize}
-	\item \textbf{SAPERE Incarnation}: The simulator's first stable incarnation. It was developed in the context of the SAPERE EU project~\cite{SAPEREon48:online}. The core of SAPERE is the concept of Live Semantic Annotation (LSA), which is a description of a resource (for example a sensor, service, actuator, etc.) that always maps the current resource status (could be considered a prelude to the currently famous digital twin concept).
-	\item \textbf{Protelis Incarnation}: Protelis~\cite{Protelis97:online} is a language. Its goal is to make it easier to build a resilient and well-behaved networked system out of a variety of potentially mobile devices. Protelis is intended for the "aggregate programming" paradigm, which is a way of thinking about and decomposing problems that can be solved using a network of distributed sensors and computers.
-	\item \textbf{Biochemistry Incarnation}: An Alchemist incarnation that was created to provide support for biochemical reactions which occur inside a biological cell or a group of cells that share a common environment.
+	\item \textbf{SAPERE Incarnation}: The simulator's first stable incarnation. It was developed in the context of the SAPERE EU project~\cite{SAPEREon48:online}. The core of SAPERE is the concept of Live Semantic Annotation (LSA), which is a description of a resource (for example a sensor, service, actuator, etc.) that always maps the current resource status (could be considered a prelude to the currently famous digital twin concept);
+	\item \textbf{Protelis Incarnation}: Protelis~\cite{Protelis97:online} is a language. Its goal is to make it easier to build a resilient and well-behaved networked system out of a variety of potentially mobile devices. Protelis is intended for the "aggregate programming" paradigm, which is a way of thinking about and decomposing problems that can be solved using a network of distributed sensors and computers;
+	\item \textbf{Biochemistry Incarnation}: An Alchemist incarnation that was created to provide support for biochemical reactions which occur inside a biological cell or a group of cells that share a common environment;
 	\item \textbf{SCAFI Incarnation}: ScaFi ~\cite{ScaFiAgg69:online} (Scala Fields) is a Scala-based Aggregate Programming library and framework. It implements a variant of the Higher-Order Field Calculus (HOFC) operational semantics and provides a platform and API for simulating and executing Aggregate Computing systems and applications.
 \end{itemize}
 
