@@ -4,6 +4,8 @@
 \usepackage{thesis-style}
 \typeout{Document version: \version}
 
+\addbibresource{backMatter/bibliography.bib}
+
 \begin{document}
 \frontmatter
 \input{frontMatter/front.tex}
@@ -26,6 +28,5 @@
 \include{chapters/6-conclusions.tex}
 
 \nocite{*}
-\bibliographystyle{plain}
-\bibliography{backMatter/bibliography.bib}
+\printbibliography
 \end{document}
