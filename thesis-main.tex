@@ -1,35 +1,14 @@
 \documentclass[12pt,a4paper,openright,twoside]{book}
-
-\usepackage[utf8]{inputenc}
-\newcommand{\thesislang}{english}
+\input{utilities/includes.tex}
+\input{utilities/commands.tex}
 \usepackage{thesis-style}
-\newcommand{\versionmajor}{0}
-\newcommand{\versionminor}{1}
-\newcommand{\versionpatch}{2}
-\newcommand{\version}{\versionmajor.\versionminor.\versionpatch}
 \typeout{Document version: \version}
-
-\newcommand{\centerImage}[4] {
-	\begin{figure}[H]
-		\begin{center}
-			\includegraphics[width=#4\linewidth]{#1}
-			\caption{#2}
-			\label{fig:#3}
-		\end{center}
-	\end{figure}
-}
 
 \begin{document}
 \frontmatter
-\input{front.tex}
-
-\begin{abstract}
-Max 2000 characters, strict.
-\end{abstract}
-
-\begin{acknowledgements} % this is optional
-Optional. Max 1 page.
-\end{acknowledgements}
+\input{frontMatter/front.tex}
+\input{frontMatter/abstract.tex}
+\input{frontMatter/acknowledgements.tex}
 
 \tableofcontents
 
@@ -39,79 +18,14 @@ Optional. Max 1 page.
 
 \mainmatter
 
-\chapter{\introductionname}
-\label{chap:introduction}
-\section{Background}
-\label{sec:background}
-\subsection{The Alchemist Simulator}
-\label{ssec:the-alchemist-simulator}
-\subsection{Exploring Feasible Designs: Stadia-like Streaming and Everything in Browser}
-\label{ssec:exploring-feasible-designs-stadia-like-streaming-and-everything-in-browser}
-\section{Objectives and Motivations}
-\label{sec:objectives-and-motivations}
-\chapter{Analysis}
-\label{chap:analysis}
-\section{APM Approach and Proof of Concept}
-\label{sec:apm-approach-and-proof-of-concept}
-\section{Comparative Study of Transpilation Technologies and Alternatives}
-\label{sec:comparative-study-of-transpilation-technologies-and-alternatives}
-\subsection{DoppioJVM}
-\label{ssec:doppiojvm}
-\subsection{TeaVM}
-\label{ssec:teavm}
-\subsection{JSweet}
-\label{ssec:jsweet}
-\subsection{JTransc}
-\label{ssec:jtransc}
-\section{Kotlin Multiplatform}
-\label{sec:kotlin-multiplatform}
-\subsection{Handling Third-Party Dependencies}
-\label{ssec:handling-third-party-dependencies}
-\chapter{Design}
-\label{chap:design}
-\section{High Level Architecture}
-\label{sec:high-level-architecture}
-\section{Shared Components (Common Kotlin)}
-\label{sec:shared-components-common-kotlin}
-\subsection{Data Model}
-\label{ssec:data-model}
-\subsection{Renderer}
-\label{ssec:renderer}
-\section{Server (Kotlin/JVM)}
-\label{sec:server-kotlin-jvm}
-\subsection{Architecture}
-\label{ssec:architecture}
-\subsection{API Endpoints}
-\label{ssec:api-endpoints}
-\section{Client (Kotlin/JS)}
-\label{sec:client-kotlin-js}
-\subsection{User Interface Components}
-\label{ssec:user-interface-components}
-\subsection{API Interfaces and Application Logic}
-\label{ssec:api-interfaces-and-application-logic}
-\chapter{Implementation}
-\label{chap:implementation}
-\section{Serialization with kotlinx.serialization}
-\label{sec:serialization-with-kotlinx-serialization}
-\subsection{Surrogate Classes and Custom Serializers}
-\label{ssec:surrogate-classes-and-custom-serializers}
-\subsection{Polymorphic Serialization}
-\label{ssec:polymorphic-serialization}
-\section{State Management with ReduxKotlin}
-\label{sec:state-management-with-reduxkotlin}
-\subsection{Data Stores, Reducers and Actions}
-\label{ssec:data-stores-reducers-and-actions}
-\chapter{Validation}
-\label{chap:validation}
-\section{Automated Testing In Kotlin Multiplatform}
-\label{sec:automated-testing-in-kotlin-multiplatform}
-\section{Frontend Testing}
-\label{sec:frontend-testing}
-\chapter{\conclusionsname}
-\label{chap:conclusions}
-\section{Future Works}
-\label{sec:future-works}
+\include{chapters/1-introduction.tex}
+\include{chapters/2-analysis.tex}
+\include{chapters/3-design.tex}
+\include{chapters/4-implementation.tex}
+\include{chapters/5-validation.tex}
+\include{chapters/6-conclusions.tex}
+
 \nocite{*}
 \bibliographystyle{plain}
-\bibliography{bibliography}
+\bibliography{backMatter/bibliography.bib}
 \end{document}
