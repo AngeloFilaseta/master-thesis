@@ -2,21 +2,191 @@
 \label{chap:design}
 \section{High Level Architecture}
 \label{sec:high-level-architecture}
+The project has been named "Alchemist Web Renderer" because the main component is designed for seamless integration into a web environment. \fullref{fig:alchemist-sourcesets} depicts the most simple source set structure that the application must have in order to operate on both JavaScript and Java Virtual Machine environments. The source sets ending with "Main" store the main code, while the source sets ending with "Test" contain the code for testing the functionalities.
+
+\centerImage{figures/alchemist-sourcesets.png}{Alchemist Web Renderer - Source Set structure}{alchemist-sourcesets}{1}
+
+A UML component diagram representing the Architecture of the Alchemist Web Renderer project is presented in \fullref{fig:architecture-all}. The shown UML component diagram is meant to be a high-level representation of how the whole system works. It shows the major components and their interactions, it is not meant to provide detailed information about each component. Those will be explained in more detail later on, including every implementation details that may be relevant to understand the system's overall functionalities.\newline
+
+\centerImage{figures/architecture-all.png}{Alchemist Web Renderer - UML Component Diagram}{architecture-all}{0.7}
+
+The four illustrated components are the following:
+\begin{itemize}
+	\item \textbf{Shared Components}: A component written using \textit{Common Kotlin}. This means that the Kotlin source code can be used freely in any platform as a dependency. The component encapsulates the following objects:
+	\begin{itemize}
+		\item \textbf{Data Model}: The main model of the whole project;
+		\item \textbf{Renderer}: APIs to generate a visual representation of the Alchemist Environment starting from elements contained in the Data Model.
+	\end{itemize}
+	It is crucial that the various parts or components of the system are able to function properly on any type of platform. This is why there are dependencies between the Client and Server components, which allows for all of the advantages that were previously discussed in \fullref{sec:kotlin-multiplatform}. In fact, these dependencies greatly improve the overall usability and makes the system more scalable and adaptable to future changes and developments.
+	\item \textbf{Simulation}: A component that represent the simulation running on the \textit{Server}. The API already exists and must not be created.
+	\item \textbf{Server}: A component that represents a Web Server that offers various services. It depends on the \textit{Shared Components} because \textit{Data Model} and \textit{Renderer} APIs are required for internal operations and are useful for communicating with the \textit{Client} component. \textit{Server} also depends on the \textit{Simulation} component, because it is possible to do operations on the original JVM Simulation interface (i.e., starting the simulation or retrieving information on the Environment) using the offered API Endpoints.
+	\item \textbf{Client}: A component that represents a JS artifact that can be ran on a Web Browser. It is the file containing all the logic that is used to add interactivity and dynamic behavior to the web page. The Javascript artifact is offered by the \textit{Server} upon connecting. It also depends on the \textit{Shared Components} because all the operations that the server is able to do using the \textit{Data Model} and the \textit{Renderer} must be possible on this component too.
+\end{itemize}
 \section{Shared Components (Common Kotlin)}
 \label{sec:shared-components-common-kotlin}
+Common Kotlin code can be used across different platforms without modification. This means that components that are useful in different platforms are contained in a single shared codebase but can be used anywhere. In the context of the Alchemist Web Renderer project, the \textit{Data Model} and \textit{Render} components are written using Common Kotlin.
 \subsection{Data Model}
 \label{ssec:data-model}
+The \textit{Data Model} of the Alchemist Web Renderer project is primarily composed of Surrogate classes. More detailed explanation of what a surrogate class is and why the model was structured this way will be better explained in \fullref{ssec:surrogate-classes-and-custom-serializers}. For now, surrogate classes can be seen as a sort of twin classes of other classes that can not be used in the current context for determined motivations. The \textit{Data Model} is shown as a UML Class Diagram in \fullref{fig:data-model}.\newline
+
+\centerImage{figures/data-model.png}{Data Model - UML Class Diagram}{data-model}{1}
+
+Every Surrogate class shown can be seen as a simplified version of another class, for example \kotlin{EnvironmentSurrogate} is the Surrogate class of the original \kotlin{Environment} class and so on. An exact mapping is not always possible, some attributes may be moved elsewhere and little changes in their form may be required, but it most cases the surrogate class is pretty similar to the original one.\newline
+
+This \textit{Data Model} represents a simplified version of the Alchemist original data model, as it is inspired by the original classes contained in the JVM project, which are inspired by the meta model described in \fullref{ssec:the-alchemist-simulator}. \kotlin{EnvironmentSurrogate} is the class at the top level, other classes are related to \kotlin{EnvironmentSurrogate} via some sort of composition. A summary of the Data Model is provided below.\newline
+
+An \kotlin{EnvironmentSurrogate} is characterized by a dimensions attribute, which states the number of dimensions the Environment contains. An \kotlin{EnvironmentSurrogate} is composed by many \kotlin{NodeSurrogate}, which are characterized by an id. A \kotlin{NodeSurrogate} is located in a \kotlin{PositionSurrogate}, a class that represents a position in the space. It is characterized by the coordinates and the dimensions fields. A \kotlin{PositionSurrogate} can be specialized in a \kotlin{Position2DSurrogate}, which is basically a position with just two coordinates, x and y, or in a \kotlin{GeneralPositionSurrogate} which is a class that can represent any type of position.
+Finally, every \kotlin{NodeSurrogate} contains many \kotlin{MoleculeSurrogate} that are linked to the corresponding \kotlin{ConcentrationSurrogate}.\newline
+
+There are few differences between the \textit{Data Model }structure and the original Alchemist interfaces.
+\begin{itemize}
+	\item The position of a node is stored inside a Node in this implementation, while in the original model the Environment is responsible of storing them;
+	\item The hierarchy and structure of classes that represent positions is a bit different. \kotlin{GeneralPositionSurrogate} does not have a JVM counterpart, and the recursive bound disappeared.
+\end{itemize}
+Once more, the motivation for these choices are better explained in \fullref{chap:implementation}, but they are mostly related to performance improvements, better organization of code, or the need to use a specific functionality in a third-party library.
 \subsection{Renderer}
 \label{ssec:renderer}
+
+The UML Class Diagram in \fullref{fig:renderer} shows the classes involved in the rendering operations.\newline
+
+\centerImage{figures/renderer-class.png}{Renderer - UML Class Diagram}{renderer}{0.5}
+
+The \kotlin{Renderer} interface is surely the most important one. Its intent is to generate a result starting from the information contained in an \kotlin{EnvironmentSurrogate} class. The interface is used to create specific implementations of different renderer components that may use different strategies for the creation of the final result. It is crucial to note that the templates in the diagram will then be translated into type parameters in the Kotlin programming language. The \kotlin{Renderer} interface presents the same type parameters of the \kotlin{EnvironmentSurrogate} with the addiction of \kotlin{R}, which is the type of the computed result.
+By representing it this way, the result of the \kotlin{render()} function can be bound to any class. In the image, an example is shown in the \kotlin{BitmapRenderer} class, which binds \kotlin{R} to the \kotlin{Bitmap} class. It is useful because a Renderer could return an image in a raster format by binding \kotlin{R} to an Array, or to an SVG or Base64 image by binding \kotlin{R} to a String.\newline
+
+A class implementing the \textit{Renderer} interface will likely depends on third-party libraries to be able to perform its functions more easily. It's essential to keep in mind that in this scenario, the library selection is constrained, as it must be a multi-platform library.
+
+\begin{info}[Note:]
+	The Renderer component can not use platform-specific libraries, making it unfeasible to use the full range of JavaScript-based libraries for image creation and animation. This is due to the requirement of running JavaScript code on the JVM server, which is not possible in the project's current state. Moreover, it's worth noting that the use of a transpiler is now more practical, as the dependency on original JVM Alchemist structures has been eliminated and replaced with straightforward surrogate classes that contains really basic data types. However, it is not the main goal for this thesis to discuss this topic.
+\end{info}
 \section{Server (Kotlin/JVM)}
 \label{sec:server-kotlin-jvm}
+Kotlin/JVM code is limited to be used within a JVM, as it often heavily relies on external dependencies that are only supported in this environment. The Kotlin/JVM module of the Alchemist Web Renderer project was developed to facilitate interaction with the Alchemist JVM classes, such as the Simulation interface. As a result, the web service was not built using JavaScript, which is common in a MEAN stack, but instead was constructed using JVM-based languages, primarily Kotlin.
 \subsection{Architecture}
 \label{ssec:architecture}
+An UML Class Diagram representing the Server Architecture is shown in \fullref{fig:server}. A description of the architecture follows:
+
+\centerImage{figures/server-architecture.png}{Server - UML Class Diagram}{server}{1}
+
+\begin{itemize}
+	\item \textbf{Server}: It exposes some API Endpoints that are not represented in the class diagram but that are discussed in \fullref{ssec:api-endpoints}. In this architecture, the \kotlin{Server} class serves as the central component as it acts as a container for all other classes and provides operations through the API Endpoints. The \kotlin{Server} holds:
+	\begin{itemize}
+		\item an Alchemist \kotlin{Simulation};
+		\item an \kotlin{EnvironmentSurrogate}, representing the current Environment in a surrogate form;
+		\item an instance of the \kotlin{Renderer} component that can be used to generate the visual representation of an \kotlin{EnvironmentSurrogate} which must be sent to the client.
+	\end{itemize}
+	\item \textbf{OutputMonitor}: An Alchemist interface designed to visualize the simulation and allow access to the simulation state through the use of the Observer~\cite{design-patterns} design pattern. Every time the simulation is updated, a method that has access to the new environment and to the reaction that caused the change is called. There may be multiple application for this interface.
+	\item \textbf{EnvironmentMonitor}: In this context, a realization of the \kotlin{OutputMonitor} interface called \kotlin{EnvironmentMonitor} is created to convert the \kotlin{Environment} into its surrogate form. In this design, every time the \kotlin{Environment} is updated, the old state is not maintained and only the last version of the \kotlin{EnvironmentSurrogate} is stored.  \kotlin{EnvironmentMonitor} uses lots of \kotlin{SurrogateMappingFunctions} iteratively to create the surrogate class requested that the \kotlin{Server} will then store. The \kotlin{EnvironmentSurrogateMappingFunction} is surely used at the top level, even though it is not represented in the image.
+	\item \textbf{SurrogateMappingFunction}: A function that maps an Alchemist structure to its surrogate form. A \kotlin{SurrogateMappingFunction} can be used by another \kotlin{SurrogateMappingFunction} iteratively. An instance example is the \kotlin{MoleculeSurrogateMappingFunction} which maps a \kotlin{Molecule} into a \kotlin{MoleculeSurrogate}.
+\end{itemize}
+The \kotlin{Server} class has access to the most recent \kotlin{EnvironmentSurrogate} and a \kotlin{Renderer} instance, providing sufficient resources to use both the stadia-like and everything in browser approach. In fact:
+\begin{itemize}
+	\item In a \textbf{stadia-like} approach, the \textit{Server} obtains an \kotlin{EnvironmentSurrogate} and passes it as the input to the \textit{Renderer} component. The resulting output image would be then transmitted to the \textit{Client} upon request.
+	The UML Sequence diagram depicted in \fullref{fig:sequence-server} illustrates the various interactions starting with a client sending an HTTP request, culminating in the receipt of an array of integers that is then mapped back into an image, called Bitmap in this specific implementation.
+
+	\centerImage{figures/sequence-server.png}{Stadia Like approach - UML Sequence Diagram}{sequence-server}{1}
+
+	\item In a \textbf{everything in browser} approach the \textit{Server} simply needs to transmit a serialized form of the \kotlin{EnvironmentSurrogate} to the \textit{Client}. As outlined in \fullref{sec:serialization-with-kotlinx-serialization}, this is a straightforward process because the surrogate classes are composed of fields of simple data types that can easily be converted into a string format. The \textit{Client} would then be responsible of rendering the \kotlin{EnvironmentSurrogate}. The interactions are, once again, shown in the UML Sequence diagram in \fullref{fig:sequence-client}.
+
+	\centerImage{figures/sequence-client.png}{Everything in Browser approach - UML Sequence Diagram}{sequence-client}{0.8}
+\end{itemize}
+The light-gray shade represents components that are located on the same machine and are written in the same programming language.
 \subsection{API Endpoints}
 \label{ssec:api-endpoints}
+The server is composed of REST HTTP API that serve as a back-end for the application. Routes are defined, structured and divided in function of the operation type. The REST API facilitates communication between a client and server through the sending of HTTP requests from the client to the server. With this setup, the client is responsible for initiating all communication, while the server does not actively send information to the client.\newline
+
+Real-time communication can be required in the future. This would also imply the active sending of information from the server to the client by employing WebSockets. This technology provides a two-way communication channel between the client and server, enabling both parties to initiate communication whenever necessary. All the API Endpoints that are available are now listed:
+\paragraph{GET /}: Returns the \textit{index.html} file to the client. The response code can be:
+\begin{itemize}
+	\item \textbf{200 (OK)}: the resource has been located. The \textit{index.html} is sent as the body of the response message.
+	\item \textbf{404 (Not Found)}: the resource has not been located for some reason. A string \textit{``Main index.html is missing."} is sent as the body of the response.
+\end{itemize}
+\paragraph{GET /environment/client}: retrieves the current state of the Environment and sends it in a serialized form. The response code can only be:
+\begin{itemize}
+	\item \textbf{200 (OK)}: the Environment is successfully sent to the client as the body of the response. The format depends on the server implementation, for now the JSON format is used for motivation given in \fullref{chap:implementation}.
+\end{itemize}
+\paragraph{GET /environment/server}: retrieves the current state of the Environment. The server will render and send it back to the client in an already rendered form as the body of the response. The response code can only be:
+\begin{itemize}
+	\item \textbf{200 (OK)}: the Environment is successfully sent to the client as the body of the response. The format depends on the server implementation, for now an array of integers representing a raster image is used. The used color format is RGBA, meaning that the size of the array is four time bigger that the pixel area of the image.
+\end{itemize}
+\begin{warn}
+	The operations available on the \textbf{/environment} route endpoints do not provide error responses, but they could return an uninitialized environment if it has not been initialized yet. In such cases, the environment will have 0 nodes.
+\end{warn}
+\paragraph{GET /simulation/status}: retrieves the simulation status and returns it to the client. The response code can be:
+\begin{itemize}
+	\item \textbf{200 (OK)}: the status is correctly retrieved. The simulation status is sent as the body of the response in a serialized form.
+	\item \textbf{500 (Server Error)}: the Simulation was not loaded correctly. A string \textit{``Simulation not loaded."} is contained in the response body.
+\end{itemize}
+\paragraph{POST /simulation/play}: plays the simulation. The response code can be:
+\begin{itemize}
+	\item \textbf{200 (OK)}: the operation succeeded. A string \textit{``Action executed."} is sent back as the body of the response.
+	\item \textbf{409 (Conflict)}: the simulation state is invalid and the play operation can not be called. If the simulation is already running, a string \textit{``The Simulation is already running."} is returned as the response body. Like in the \textbf{/simulation/pause} route, other possible conflict messages are:
+	\begin{itemize}
+		\item \textit{``The Simulation is being initialized."}: the simulation is in the initialization status and operation can not be called until it is ready.
+		\item \textit{``The Simulation is terminated."}: the simulation is terminated and it is impossible to go beyond this point.
+	\end{itemize}
+	\item \textbf{500 (Server Error)}: the Simulation was not loaded correctly. A string \textit{``No Simulation found on the server."} is contained in the response body.
+\end{itemize}
+\paragraph{POST /simulation/pause}: pauses the simulation. The response code can be:
+\begin{itemize}
+	\item \textbf{200 (OK)}: the operation succeeded. A string \textit{``Action executed."} is sent back as the body of the response.
+	\item \textbf{409 (Conflict)}: the simulation state is invalid and the pause operation can not be called. If the simulation is already paused, a string \textit{``The Simulation is already paused."} is returned as the response body. Like in the \textbf{/simulation/play} route, other possible conflict messages are:
+	\begin{itemize}
+		\item \textit{``The Simulation is being initialized."}: the simulation is in the initialization status and operation can not be called until it is ready.
+		\item \textit{``The Simulation is terminated."}: the simulation is terminated and it is impossible to go beyond this point.
+	\end{itemize}
+	\item \textbf{500 (Server Error)}: the Simulation was not loaded correctly. A string \textit{``No Simulation found on the server."} is contained in the response body.
+\end{itemize}
+
+While it could have been possible to incorporate the play and pause operations on the same \textbf{/simulation} route by expressing the desired action in the request body or as a parameter, most of the code has been split for architectural reasons. This separation allows for greater flexibility in the future, making it easier to transition to a WebSocket approach where the server can push environment updates directly to clients. The separation of logic helps ensure that the overall architecture remains adaptable and can easily accommodate changes.
+
 \section{Client (Kotlin/JS)}
 \label{sec:client-kotlin-js}
+Kotlin/JS enables to transpile Kotlin code to Javascript. It also provides the capability to develop simple browser applications, Node.js applications, or structured applications using popular frameworks such as Angular, React.js, or Vue.js. Additionally, it is possible to include dependencies directly from npm (Node Package Manager), making it a versatile tool for a wide range of web development projects. The Kotlin/JS module of the Alchemist Web Render project aims to create a user-friendly single page application that enables the interaction with simulations and offer the possibility to visualize the environment.
 \subsection{User Interface Components}
 \label{ssec:user-interface-components}
+
+A wireframe was used to design the user interface for the Alchemist Web Renderer project. That is a low-fidelity representation of a user interface design. It typically includes the layout of content, the positioning of buttons and other components, and the flow between various screens of a web page or application. Before creating a more polished, high-fidelity prototype, wireframes act as a road-map for the development process and helps visualizing and approving the design. The designed wireframe can be viewed in \fullref{fig:wireframe}.\newline
+
+\centerImage{figures/wireframe.png}{User Interface - Wireframe}{wireframe}{1}
+
+The User Interface (UI) should now be divided into a component hierarchy. The first step is to label every component (and sub-component) in the wireframe by drawing boxes around them.
+According to the Single Responsibility Principle, each software module should change only if there is one valid reason~\cite{CleanCod98:online}. This principle has been used here to define what a component is. A component should ideally perform just one task. If it ends up growing, it may be necessary to break it down into smaller parts.
+
+\centerImage{figures/wireframe-h.png}{User Interface with Components Highlighting}{ui-highlighting}{1}
+
+As reported in \fullref{fig:ui-highlighting}, there are 4 main components in the App. Some of them are included inside others, as composition is a great way to reuse components if needed. The chosen names for the identified components are now listed, also describing what is the main task associated with each component.
+
+\begin{itemize}
+	\item \textbf{PlayButton}: The orange rectangle is mapped to this component. \textit{PlayButton} is a button that the user can click to start and pause the simulation. Its main task is sending a message to the server to start or pause the simulation, using the \url{/simulation/play} and \url{/simulation/pause} API Endpoints already described in \fullref{ssec:api-endpoints}.
+	\item \textbf{RenderModeButtons}: The red rectangle is mapped to this component. \textit{RenderModeButtons} is made of 3 buttons that the user can click to select the Render mode. Its main task is selecting a proper strategy that will then be used when requesting the environment to the server, using the \url{/environment} API Endpoints already described in \fullref{ssec:api-endpoints}. The Auto button would select the optimal strategy based on the machine capabilities.
+	\item \textbf{AppNavbar}: The magenta rectangle is mapped to this component. \textit{AppNavbar} acts as a cointainer for the \textit{PlayButton} and \textit{RenderModeButtons} components. It also includes the logo, which is not considered a component as it is a simple image that does not require state management.
+	\item \textbf{AppContent}: The cyan rectangle is mapped to this component. \textit{AppContent} is responsible of showing the Environment to the user. Its main task is retrieving the Environment and adding it to the web page.
+\end{itemize}
+
+The whole App container is also a component, which is called \textbf{App}. It basically acts as a container of the \textit{AppNavbar} and \textit{AppContent} components. The final components hierarchical structure is the following
+\begin{itemize}
+	\item App
+	\begin{itemize}
+		\item AppNavbar
+		\begin{itemize}
+			\item PlayButton
+			\item RenderModeButtons
+		\end{itemize}
+		\item AppContent
+	\end{itemize}
+\end{itemize}
+More details about the components implementation will be discussed later in \fullref{chap:implementation}.
+
 \subsection{API Interfaces and Application Logic}
 \label{ssec:api-interfaces-and-application-logic}
+The Kotlin/JS module primarily consists of code that defines the structure of the application and has limited logic. The APIs make asynchronous requests to the server and retrieve the responses to update the state. The management of the application's internal state is described in detail in the \fullref{sec:state-management-with-reduxkotlin} section. A list of the defined APIs, which are used to interact with the Server, is provided below:
+\begin{itemize}
+	\item \kotlin{getEnvironmentClient()}: sends a request to \textbf{/environment/client} in order to obtain the serialized version of the \kotlin{EnvironmentSurrogate}. The local \kotlin{Renderer} component will use it to create an image that will then be showed in the \textit{AppContent} component.
+	\item \kotlin{getEnvironmentServer()}: sends a request to \textbf{/environment/server} in order to obtain the already rendered version of the \kotlin{EnvironmentSurrogate}. The image will then be showed in the \textit{AppContent} component.
+	\item \kotlin{getSimulationStatus()}: sends a request to \textbf{/simulation/status} to obtain the status of the simulation. The status is saved locally and it is used to change some component of the UI, such as the form and the behavior of the \textit{PlayButton} component.
+	\item \kotlin{playSimulation()}: sends a request to \textbf{/simulation/play} to play the simulation.
+	\item \kotlin{pauseSimulation()}: sends a request to \textbf{/simulation/pause} to pause the simulation.
+\end{itemize}
+
+The application's logic is simple. The client must request an environment actively. This task is handled by a top-level function named \kotlin{updateState()}, which is called at specified intervals using Javascript's underlying \kotlin{setInterval()} function. This method is not optimal as the environment is not updated with every simulation update but it is simpler to implement and useful for verifying the architecture's functionality. This aspect will be better remarked in \fullref{sec:future-works}.
