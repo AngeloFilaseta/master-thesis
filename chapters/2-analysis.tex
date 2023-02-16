@@ -16,11 +16,11 @@ There are ton of possibilities when creating an architecture. However there are 
 	\item The Renderer of the system must be as flexible as possible, it should run on a JVM and in a Web Environment at least. The most used languages for web development are Javascript and Web Assembly (Wasm).
 \end{itemize}
 
-The architecture design of the first proof of concept tries to reuse as much as possible the existing structures in the Alchemist codebase, shifting the issues of conversion and interoperability  onto the yet-to-exist renderer component. In this architecture idea the Renderer is a component (visualized as a UML Component in Figure \ref{fig:jvm-renderer}), written using a JVM language, which requires an \textit{Environment} and offers an \textit{Image} in any format depending on the implementation. It could be a raster image, or even better, any sort or scalable format, like an SVG string.
+The architecture design of the first proof of concept tries to reuse as much as possible the existing structures in the Alchemist codebase, shifting the issues of conversion and interoperability  onto the yet-to-exist renderer component. In this architecture idea the Renderer is a component (visualized as a UML Component in \fullref{fig:jvm-renderer}), written using a JVM language, which requires an \textit{Environment} and offers an \textit{Image} in any format depending on the implementation. It could be a raster image, or even better, any sort or scalable format, like an SVG string.
 
 \centerImage{figures/jvmRendererComponent.png}{JVM Renderer Component - First Proof of Concept}{jvm-renderer}{0.5}
 
-The architecture shown in the UML component diagram in Figure \ref{fig:proof} is representative of the idea of using a \textit{transpiler} to create another Renderer component in a web language starting from its JVM implementation. If the \textit{Transpiled Renderer} is converted successfully, it will be possible to use the \textit{Renderer} component on both the server and the client machine.
+The architecture shown in the UML component diagram in \fullref{fig:proof} is representative of the idea of using a \textit{transpiler} to create another Renderer component in a web language starting from its JVM implementation. If the \textit{Transpiled Renderer} is converted successfully, it will be possible to use the \textit{Renderer} component on both the server and the client machine.
 
 \begin{info}[Transpiler:]
 	Also known as a source-to-source compiler, it is a type of compiler that takes source code written in one programming language and converts it into another. JVM languages and JavaScript are very different in terms of syntax and semantics. However, it is possible to achieve a Java to JavaScript conversion using a transpiler.
@@ -159,13 +159,12 @@ J2CL (Closure Compiler) is the new transpiler for Java made by Google that allow
 \label{sec:kotlin-multiplatform}
 
 \begin{info}[Anticipation:]
-	The creation of a proof of concept using the Kotlin Multiplatform framework was successful. An exhaustive explanation about the design and how everything was implemented will be discussed in the dedicated \ref{chap:design} Design and \ref{chap:implementation} Implementation chapters. For now, only a brief explanation of how Kotlin Multiplatform works will be provided.
+	The creation of a proof of concept using the Kotlin Multiplatform framework was successful. An exhaustive explanation about the design and how everything was implemented will be discussed in the dedicated \fullref{chap:design} and \fullref{chap:implementation}. For now, only a brief explanation of how Kotlin Multiplatform works will be provided.
 \end{info}
 
-One of the main advantages of Kotlin is its support for multiplatform programming. It helps in keeping the flexibility and advantages of native programming while cutting down on the effort spent writing and maintaining the same code for several platforms. Referring to Figure \ref{fig:kotlin-mp}:
+One of the main advantages of Kotlin is its support for multiplatform programming. It helps in keeping the flexibility and advantages of native programming while cutting down on the effort spent writing and maintaining the same code for several platforms. Referring to \fullref{fig:kotlin-mp}:
 
 \centerImage{figures/kotlin-multiplatform.png}{Kotlin Multiplatform - Supported Platforms}{kotlin-mp}{0.5}
-
 
 \begin{itemize}
 	\item The language, basic tools, and core libraries are all part of \emph{Common Kotlin}. Common Kotlin code runs on all systems and is portable;
@@ -180,7 +179,7 @@ Kotlin Multiplatform may have many applications, but the following are some of t
 	\item \textbf{Building a full-stack web app}: The two main targets are Kotlin/JVM (for the server) and Kotlin/JS (for the client). The shared code, mainly consists in the model of the application, but can also contains common logic that may run on both the server and the client.
 \end{itemize}
 
-Kotlin Multiplatform enables code sharing through its mechanisms. The source code is organized into source sets, each targeting a specific platform. Figure \ref{fig:kotlin-mp-sourcesets} shows the dependencies among source sets. As shown, if there is business logic that applies to all platforms, it can be shared in the common source set, eliminating the need to write the same code multiple times.
+Kotlin Multiplatform enables code sharing through its mechanisms. The source code is organized into source sets, each targeting a specific platform. \fullref{fig:kotlin-mp-sourcesets} shows the dependencies among source sets. As shown, if there is business logic that applies to all platforms, it can be shared in the common source set, eliminating the need to write the same code multiple times.
 
 \centerImage{figures/sourcesets.png}{Kotlin Multiplatform - Source set dependencies~\cite{Sharecod25:online}}{kotlin-mp-sourcesets}{1}
 

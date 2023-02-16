@@ -51,6 +51,7 @@
 	\end{mdframed}
 }
 
+\setmintedinline{breaklines}
 
 \newcommand{\kotlin}[1]{
 	\mintinline[breakanywhere]{kotlin}{#1}
@@ -59,3 +60,5 @@
 \newcommand{\java}[1]{
 	\mintinline[breakanywhere]{java}{#1}
 }
+
+\newcommand*{\fullref}[1]{\hyperref[{#1}]{\autoref*{#1} (\nameref*{#1})}}
