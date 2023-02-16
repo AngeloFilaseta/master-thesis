@@ -2,9 +2,14 @@
 \input{utilities/includes.tex}
 \input{utilities/commands.tex}
 \usepackage{thesis-style}
-\typeout{Document version: \version}
 
 \addbibresource{backMatter/bibliography.bib}
+
+\newcommand{\versionmajor}{0}
+\newcommand{\versionminor}{2}
+\newcommand{\versionpatch}{0}
+\newcommand{\version}{\versionmajor.\versionminor.\versionpatch}
+\typeout{Document version: \version}
 
 \begin{document}
 \frontmatter
