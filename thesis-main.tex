@@ -1,15 +1,15 @@
 \documentclass[12pt,a4paper,openright,twoside]{book}
-\input{utilities/includes.tex}
-\input{utilities/commands.tex}
+\input{./utilities/includes.tex}
+\input{./utilities/commands.tex}
 \usepackage{thesis-style}
 
-\addbibresource{backMatter/bibliography.bib}
+\addbibresource{./backMatter/bibliography.bib}
 
 \begin{document}
 \frontmatter
-\input{frontMatter/front.tex}
-\input{frontMatter/abstract.tex}
-\input{frontMatter/acknowledgements.tex}
+\input{./frontMatter/front.tex}
+\input{./frontMatter/abstract.tex}
+\input{./frontMatter/acknowledgements.tex}
 
 \tableofcontents
 
@@ -19,12 +19,12 @@
 
 \mainmatter
 
-\include{chapters/1-introduction.tex}
-\include{chapters/2-analysis.tex}
-\include{chapters/3-design.tex}
-\include{chapters/4-implementation.tex}
-\include{chapters/5-validation.tex}
-\include{chapters/6-conclusions.tex}
+\include{./chapters/1-introduction.tex}
+\include{./chapters/2-analysis.tex}
+\include{./chapters/3-design.tex}
+\include{./chapters/4-implementation.tex}
+\include{./chapters/5-validation.tex}
+\include{./chapters/6-conclusions.tex}
 
 \nocite{*}
 \printbibliography
