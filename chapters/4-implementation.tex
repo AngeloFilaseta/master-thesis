@@ -3,11 +3,269 @@
 \label{chap:implementation}
 \section{Serialization with kotlinx.serialization}
 \label{sec:serialization-with-kotlinx-serialization}
+Serialization is the process of transforming data that is used by an application into a format that can be sent over a network or stored in a database or a file. Deserialization, on the other hand, is the procedure that reads data from an external source and transforms it into a runtime object.\newline
+
+All the Alchemist data structures implements the \java{Serializable} interface~\cite{Serializ95:online}, meaning that it is possible to transform every object into a byte stream. The byte stream can be either saved to disk or transported to another system, where it can finally be deserialized to recreate the original object. However, there are several problems with Java serialization:
+
+\begin{itemize}
+	\item \textbf{Absence of multi-platform support}: Serialized objects can only be deserialized in a JVM based environment. Other programming languages that do not translate into bytecode like Javascript ot Python cannot deserialize objects that have been serialized using the \java{java.io.Serializable} interface. As it will be mentioned later, this is a must-have requirement for a possible serialization strategy;
+	\item \textbf{Security vulnerabilities}: Java serialization has been found to have various security vulnerabilities, such as allowing untrusted data to be deserialized, which can result in data breaches or other types of attacks. There is no way to know what is being deserialized before the decoding operation. It is possible that an attacker serializes a malicious object and send them to the application. Once the \kotlin{readObject()} method is called, the malicious objects have already been instantiated~\cite{AvoidJav95:online};
+	\item \textbf{Version incompatibility}: Serialized objects can become incompatible with newer versions of the class, which can cause errors when deserializing the object. The Java serialization format is not extensible, so it is not possible to add new fields to a class without breaking existing serialized objects;
+	\item \textbf{Increased memory usage}: Serialized objects can take up more memory than their non-serialized counterparts, which can be a problem for systems with limited memory resources;
+	\item \textbf{Some complex data structure cannot be serialized}: It is difficult to store certain types of data structures, for example lists with circular references, or even a simple Java \java{Optional}~\cite{Optional58:online};
+	\item \textbf{Not human-readable}: The serialized object is saved as a binary stream, which is a sequence of bytes that is not easily readable by humans.
+\end{itemize}
+
+There are several libraries available for serializing objects using a JVM based language. Some of the libraries that were taken into consideration for this project are listed here:
+\begin{itemize}
+	\item \textbf{kotlinx.serialization}: A Kotlin library for serialization and deserialization, developed by the Kotlin team at JetBrains~\cite{Kotlinko43:online};
+	\item \textbf{moshi}: A JSON library for Kotlin and Java, developed by Square. It uses a simple API and supports a wide range of types, including lists, maps, and nullable values~\cite{squaremo84:online};
+	\item \textbf{gson}: A Java library for serializing and deserializing JSON, developed by Google. It provides a very simple and easy-to-use API~\cite{googlegs30:online};
+	\item \textbf{jackson}: A very popular library for JSON Serialization and deserialization for both Kotlin and Java~\cite{FasterXM63:online}.
+\end{itemize}
+
+In this thesis, the \textit{kotlinx.serialization} library was chosen, mainly because of the multi-platform support that it offers. Some additional key benefits of this choice are:
+
+\begin{itemize}
+	\item \textbf{Code reuse}: Developers can share code across multiple platforms, reducing the amount of code duplication and making it easier to maintain and update the codebase.
+	\item \textbf{Consistency}: By sharing code across platforms, multi-platform libraries can help to ensure consistency in the behavior and user experience of an application across different platforms.
+	\item \textbf{Cost-effective}: The costs associated with developing and maintaining separate code bases for different platforms are drastically reduced.
+	\item \textbf{Reduced Development Time}: By reusing code, multi-platform libraries can help to reduce the time and effort required to develop an application for multiple platforms.
+	\item \textbf{Familiarity}: APIs do not change upon changing platform, resulting in less effort required for unskilled developers to work on the project.
+\end{itemize}
+
+When it comes to serialize objects, the format must be chosen carefully, because each format has its own strengths and weaknesses, and the best choice of format depends on the specific requirements of the project. There are many different serialization formats available, but some of the most common ones include:
+\begin{itemize}
+	\item \textbf{JSON (JavaScript Object Notation)}: A lightweight, text-based format that is widely used for data interchange. It is easy to read and write, and is supported by many programming languages and libraries~\cite{JSON74:online}.
+	\item \textbf{XML (eXtensible Markup Language)}: A markup language that is widely used for data representation. It is more verbose than JSON, but offers a number of features that are useful for representing complex data structures and for defining custom markup~\cite{Extensib95:online}.
+	\item \textbf{YAML (YAML Ain't Markup Language)}: A human-readable data serialization format. It is designed to be easy to read and write. It is often used to write configuration files~\cite{WhatisYA36:online}.
+	\item \textbf{Protocol Buffers (Google Protocol Buffers)}: A language and a platform-neutral data serialization format developed by Google. It is compact and efficient in terms of size and performances~\cite{Protocol60:online}.
+	\item \textbf{Avro} : A data serialization format that is similar to Protocol Buffers, but with a focus on data schemas and more compact binary encoding~\cite{WhatisAv78:online}.
+	\item \textbf{BSON (binary JSON)}: BSON is a binary-encoded serialization of JSON-like documents. BSON is more space-efficient than JSON, and includes additional data types such as Date and Binary~\cite{Explaini59:online}.
+\end{itemize}
+
+In the Alchemist Web Renderer project, the JSON format was chosen for the following motivations:
+\begin{itemize}
+	\item \textbf{Text based}: It is easy to read and debug. This can be especially useful when working with large or complex data sets like the Alchemist ones.
+	\item \textbf{Wide support}: JSON has become the de facto standard for data interchange on the web.
+	\item \textbf{Simple and flexible}: It is easy to add or remove fields as needed. This can be useful in situations where data needs to be shared between systems that have different requirements or where the data structure may change over time.
+\end{itemize}
+
+Nevertheless, it is possible to change from using JSON to using a different format at any time with very few changes, as \textit{kotlinx.serialization} is really versatile and can manipulates the format under the hood.\newline
+
+Classes that can be serialized must be marked explicitly. \textit{kotlinx.serialization} does not use reflections, so it is impossible to mistakenly deserialize a class that was not intended to be serializable. By including the \kotlin{@Serializable} annotation, a class is declared to be serializable. The Kotlin Serialization plugin is instructed to automatically create and connect a serializer for the class if it is marked with the \kotlin{@Serializable} annotation. The generated serializer class will inherit the \kotlin{KSerializer} interface. It is possible to retrieve the instance using the \kotlin{serializer()} function on the class's companion object. In the library, Serializers consist of three pieces:
+
+\begin{itemize}
+	\item A \kotlin{serialize()} function that implements a \kotlin{SerializationStrategy}. It is given a value to serialize along with an instance of \kotlin{Encoder}. It represents a value as a series of primitives using the \kotlin{encodeXxx} functions of \kotlin{Encoder}. For each of the primitive types that serialization supports, there is a specific \kotlin{encodeXxx}.
+	\item A \kotlin{deserialize()} function that implements a \kotlin{DeserializationStrategy}. It takes a \kotlin{Decoder} instance and returns a deserialized value. It makes use of the \kotlin{Decoder}'s \kotlin{decodeXxx} functions, which are an exact replica of \kotlin{Encoder}'s corresponding ones.
+	\item A \textbf{descriptor} property that must accurately describe what the \kotlin{encodeXxx} and \kotlin{decodeXxx} functions do. This way a format implementation knows in advance which encoding and decoding techniques the \kotlin{encodeXxx} and \kotlin{decodeXxx} functions call.
+\end{itemize}
+
+It is also possible to create a custom serializer and bind it to a class. This is done with the \kotlin{@Serializable} annotation by adding the \textit{with} property.\newline
+
+There is crucial problem considering the available codebase. The Alchemist Simulator is a JVM project, most of the data structures are written in Java or Kotlin and are meant to be used only inside a JVM. There are also lot of dependencies with libraries which do not support multiplatform at all. It is certainly still possible to treat Alchemist data structures like third-party classes and write a custom Serializer to make the \kotlin{@Serializable} annotation work. It is still important to mention that creating custom serializers for all the data structure is not ideal for the following reasons:
+\begin{itemize}
+	\item A deep understanding of the serialization process and the underlying data structure is required. This can be difficult to learn and master.
+	\item Writing complex code to handle the details of serializing and deserializing the data is required. This can be time-consuming and error-prone.
+	\item Custom serializers may need to be updated or maintained over time as the data structures or requirements change. This also results in a lot of time consumption and possible bugs/errors.
+	\item Custom serializers may be difficult for other developers to understand and use, especially if they are not well-documented or are not designed with reuse in mind.
+\end{itemize}
+
+There is another problem with using custom serializer in the project use case. Since the original structures are written using a JVM based language, the deserialization process can only work inside a JVM. This results in a compatibility problem, as existent classes cannot be used in the current project in a Kotlin/JS context. It would still be possible to navigate inside the Json Object created starting from the serialized string but this approach is also not desirable because accessing a JSON object can be much more difficult and tedious compared to accessing a structured class in a programming language.
+JSON objects do not have a fixed structure or defined set of fields. This can be more error-prone, especially if the JSON object is large or complex, or if there is not familiarity with the syntax of the JSON library being used. All of these information leads to the approach that has been used.\newline
+
+The Java class shown in \fullref{lst:molecule} is one of the simplest \textit{alchemist-api} class. In this case, the \java{Molecule} interface is defining a contract for a class to have a \kotlin{getName()} method that returns the name of the \java{Molecule} as a String. For this example in particular, the inheritance of the \java{Dependency} interface can be ignored. It is impossible to use the \java{Molecule} interface in a Kotlin/JS project, because Java is not supported. A surrogate class can be created to use the \java{Molecule} information in a context which is not JVM based.
+
 \subsection{Surrogate Classes and Custom Serializers}
 \label{ssec:surrogate-classes-and-custom-serializers}
+
+A surrogate class is used to serialize and deserialize another class (commonly a third-party class which cannot be accessed). It acts as a ``surrogate" for the original class, handling the serialization and deserialization process on behalf of the original class. Surrogate classes are often used when the original one is not directly serializable, either because:
+\begin{itemize}
+	\item It is not marked with a serialization annotation;
+	\item It has a complex internal state that cannot be easily serialized;
+	\item Third-party dependencies that does not support serialization are involved.
+\end{itemize}
+By using a surrogate class, it is also possible to customize the serialization process and selectively include or exclude certain fields or properties from the serialized representation of the original class. A valid surrogate class for the \kotlin{Molecule} class is shown in \fullref{lst:moleculeSurrogate}. \fullref{lst:serializingMoleculeSurrogate} also shows the corresponding JSON string associated with the created object.\newline
+
+The remaining step is the creation of a mapping function that can translate the content from a \kotlin{Molecule} to a \kotlin{MoleculeSurrogate}. In Kotlin, an extension function that extends the \kotlin{Molecule} class with a new function called \kotlin{toMoleculeSurrogate()} can be created. Extension functions allow to add new functions to a class without using inheritance or any type of design pattern such as decorator. \fullref{lst:toMoleculeSurrogate} shows how the extension function can be created. The function takes no input arguments and returns an instance of the \kotlin{MoleculeSurrogate} class, which is initialized with the name property of the \kotlin{Molecule} instance that the function is being called on.\newline
+\lstinputlisting[
+float,
+language=Kotlin,
+caption={MoleculeSurrogate class},
+label={lst:moleculeSurrogate},
+]{listings/MoleculeSurrogate.kt}
+
+\lstinputlisting[
+float,
+language=Kotlin,
+caption={Serialization of a MoleculeSurrogate},
+label={lst:serializingMoleculeSurrogate},
+]{listings/SerializingMoleculeSurrogate.kt}
+
+\lstinputlisting[
+float,
+language=Kotlin,
+caption={MoleculeSurrogate's Mapping Function},
+label={lst:toMoleculeSurrogate},
+]{listings/ToMoleculeSurrogate.kt}
+
+A surrogate class and its associated serialization and deserialization logic can be used on any platform, not just on the Java Virtual Machine (JVM). These steps must be repeated for every Alchemist data structure that must be serialized. Because of composition, most extension functions will use other objects' \kotlin{toXSurrogate()} to mutate their internal state into the corresponding surrogate classes.
 \subsection{Polymorphic Serialization}
 \label{ssec:polymorphic-serialization}
+Kotlin Serialization can also deal with polymorphic class hierarchies. This is useful especially because the main Alchemist structure (\textit{EnvironmentSurrogate}), that must be serialized, has two type parameters. The serialization library makes a distinction in two cases, as  polymorphism can be open or closed:
+\begin{itemize}
+	\item \textbf{Open polymorphism}: refers to the ability, for a function or class, to accept any type that is a sub-type of a specified type. This is achieved in Kotlin using the \kotlin{open} keyword and the \kotlin{is} keyword for type checking and downcasting, respectively;
+	\item \textbf{Closed polymorphism}: refers to the ability, for a function or class, to only accept a specific set of types. This can be achieved in Kotlin using the \kotlin{sealed} keyword, which is used to define a closed set of subclasses for a class~\cite{kotlinxs84:online}.
+\end{itemize}
+
+\textit{kotlinx.serialization} handles open and closed polymorphism in different ways. In this project, the serialization of the \textit{EnvironmentSurrogate} class required two different strategies for the serialization and deserialization of the two generic types of the class. The type parameters that the class declares are both covariant, which means that if a subclass is a subtype of a superclass, then an instance of the class parameterized with the subclass is considered a subtype of the class parameterized with the superclass. The type parameters are:
+\begin{itemize}
+	\item \textbf{TS}: It represents the type of the concentration surrogate. It is constrained to a subtype of \kotlin{Any}, meaning that it can be any non-nullable type in Kotlin. In the original \kotlin{Environment} data structure this type parameter is named \textbf{T} and represents the type of the concentration;
+	\item \textbf{PS}: It represents the type of the position surrogate. It is constrained to a subtype of \kotlin{PositionSurrogate} which means the type must be derived from that interface. In the original \kotlin{Environment} data structure this type parameter is named \textbf{P} and represents the type of the position.
+\end{itemize}
+
+\paragraph{Position Surrogate (PS)} The second type parameter is easier to treat, as a closed polymorphism strategy can be used for serialization. The original \kotlin{Position} interface used in Alchemist represents a position inside the \kotlin{Environment} and is defined as shown in \fullref{lst:position}.
+
+\begin{info}[Recursive bounds in Surrogate Classes:]
+	The notation
+	\kotlin{<P: Position<P>>} in the type parameter definition is called a ``recursive bound" which means that the type parameter \textit{P} must implement or inherit from the class \kotlin{Position} itself. This is an example of a self-referential type, in which a class defines itself as a type parameter.
+	There are several aspect to take in consideration using recursive bound, but to sum it up, the declaration \kotlin{Position<P: Position<P>>} can be described as: \kotlin{Position} is a generic type that can only be instantiated for its subtypes, and those subtypes will inherit some useful methods, some of which take subtype specific arguments (or otherwise depend on the subtype)~\cite{Angelika45:online}. It is worth noting that this type of notation is not always practical, as it can cause a type parameter explosion, and it also makes it harder to understand the relationship between types, hence it should be used with caution. Recursive bounds are very unpractical in serialization, as such, the surrogate classes of the position family are changed with a simpler structure without the recursive bounds.
+\end{info}
+
+\lstinputlisting[
+float,
+language=Kotlin,
+caption={Original Alchemist's Position Interface},
+label={lst:position},
+]{listings/Position.kt}
+
+A sealed interface \kotlin{PositionSurrogate} is created. It declares two properties that subclasses must implement:
+\begin{itemize}
+	\item \kotlin{coordinates}: a read-only property of type \kotlin{DoubleArray}.
+	\item \kotlin{dimensions}: a read-only property of type \kotlin{Int}.
+\end{itemize}
+These properties can also be found in the original \kotlin{Position} interface. By using the \kotlin{PositionSurrogate} interface it is possible to create surrogate classes for the classes that inherit from the original \kotlin{Position} class with ease. A \kotlin{GeneralPositionSurrogate} class is also created. It acts as a backup class that may be used if a surrogate class that fits a specific implementation on the Position class is not available.\newline
+
+The key point of the described structure is the \kotlin{sealed} keyword used to declare the \kotlin{PositionSurrogate} interface.
+The most straightforward way to use serialization with a polymorphic hierarchy, in fact, is to mark the base class/interface as \kotlin{sealed}. All the subclasses of that sealed class must be explicitly marked as \kotlin{@Serializable} for this solution to work. By using this structure it is now possible to serialize and deserialize objects of type \textit{PositionSurrogate} with ease, as shown in \fullref{lst:positionsurroateserialization}.\newline
+
+The small, but very important detail in this solution is related to static types. At compile-time, the object to serialize is declared as \kotlin{PositionSurrogate}, even though its run-time type is a specialization of that class. When serializing polymorphic class hierarchies it is important to ensure that the compile-time type of the serialized object is a polymorphic one, and not a concrete one.\newline
+
+In general, \textit{kotlinx.serialization} is designed to work correctly only when the compile-time type used during serialization is the same one as the compile-time type used during deserialization. This is not a problem, as the application that will deserialize the \kotlin{PositionSurrogate} object can always check the concrete type using the \kotlin{is} operator. A ``type" key is added to the resulting JSON object. The field is called \textit{discriminator} and it is used by the deserializer to map the object to the correct class.\newline
+
+\lstinputlisting[
+float,
+language=Kotlin,
+caption={Serialization of a PositionSurrogate},
+label={lst:positionsurroateserialization},
+]{listings/PositionSurrogateSerialization.kt}
+
+
+Considering an object of type \kotlin{EnvironmentSurrogate<Any, PositionSurrogate>}, here is what happens under the hood, considering only the second type parameter (\kotlin{PS}):
+\begin{itemize}
+	\item During the serialization process, the  \kotlin{PositionSurrogate.serializer()} is retrieved and used. The serializer will check for the type of the \kotlin{PositionSurrogate} objects contained inside the \kotlin{EnvironmentSurrogate}. The compiler is aware that the concrete type of the object is one of those contained in the set of the subclasses of the sealed interface. Once it is found, the object's properties are serialized into fields and the ``\textit{type}" discriminator is added to the JSON string as well.
+	\item  During the deserialization process, the JSON string is parsed, looking for the ``\textit{type}" discriminator. Once it is found, the compiler knows what is the concrete class of the object and can use its constructor to recreate the object as it was before serialization using the values of the fields of the JSON string as parameters. The recreated objects however must be of type \kotlin{PositionSurrogate}. The type of the container is always valid, as \kotlin{PositionSurrogate} is declared as \kotlin{sealed}.
+\end{itemize}
+
+To sum it up, by declaring \kotlin{sealed} a common interface and \kotlin{@Serializable} all the possible subclasses of that interface, the \textit{kotlinx.serialization} library will automatically manage polymorphism in the serialization and deserialization process~\cite{kotlinxs9:online}. Treating the first type parameter is a little bit tougher.
+
+\paragraph{Concentration Surrogate (TS)} The first type parameter is harder to treat, as a closed polymorphism strategy ca not be used for serialization. The concentration of a molecule can be of any type depending on the \kotlin{Incarnation} used. In this case there is not a common interface that can be used for classes to inherit. For this motivation, \kotlin{Any} is used as upper bound of the \kotlin{TS} type parameter.\newline
+
+Since this kind of polymorphism is open, there is a possibility that subclasses are defined anywhere in the source code. This is not the case, but classes could even be declared in other modules. The list of subclasses that are serialized must be explicitly registered at run-time rather than being determined at compile-time. A \kotlin{SerializersModule} must be defined using the \kotlin{SerializersModule{}} builder function in order to make the serialization work without using the \kotlin{sealed} keyword. Each subclass must be registered using the \kotlin{subclass(Class)} function in the module. The base class is specified in the \kotlin{polymorphic} builder. By using this module, a unique JSON configuration can be created and used for serialization. \fullref{lst:serializationmodule} illustrates a possible configuration, where \kotlin{ConcentrationSurrogateMock} is a concentration class. In a real configuration, there would be more \kotlin{subclass} call, one for each concentration class that must be supported.\newline
+
+The additional configuration described, makes the code work just as it would with a \kotlin{sealed} class for the \kotlin{PS} type parameter, but in this case subclasses can be spread arbitrarily throughout the code. A default behavior was also provided. During the deserialization process, if the type is  absent or not recognized, the \kotlin{EmptyConcentrationSurrogate} is used. In other words, if a serialized JSON string does not respect the schema of any of the classes that were declared as subclasses inside the module, they will be mapped to an \kotlin{EmptyConcentrationSurrogate} object, which is basically an empty class.\newline
+
+\lstinputlisting[
+float,
+language=Kotlin,
+caption={Module for the Serialization of Concentration},
+label={lst:serializationmodule},
+]{listings/SerializationModule.kt}
+
+The serialization operation, which is shown in \fullref{lst:serializationmoduleexample}, is pretty straightforward, as it is really similar to the one already shown in \fullref{lst:positionsurroateserialization}.
+However, in this case an instance of \kotlin{PolymorphicSerializer} for the base class \kotlin{Any} must be explicitly passed as the first parameter to the \kotlin{encodeToString()} function. If the parameter is missing, a \kotlin{SerializationException} is thrown, explaining that \textit{``A Serializer for class 'Any' is not found"}.\newline
+
+\lstinputlisting[
+float,
+language=Kotlin,
+caption={Serialization of a Concentration},
+label={lst:serializationmoduleexample},
+]{listings/SerializationModuleExample.kt}
+
+Now, considering an object of type \kotlin{EnvironmentSurrogate<Any, PositionSurrogate>}, here is what happens under the hood, considering only the first type parameter (\kotlin{TS}):
+\begin{itemize}
+	\item During the serialization process, the  \kotlin{PolymorphicSerializer} is retrieved and used. The serializer will check for the type of the \kotlin{Any} objects contained inside the \kotlin{EnvironmentSurrogate}. The compiler is aware that the concrete type of the object is one of those contained in the set of the subclasses declared inside the concentration module. Once it is found, the object's properties are serialized into fields and the \textit{``type"} discriminator is added to the JSON string as well. If the type is not recognized or is absent, the \kotlin{EmptyConcentrationSurrogate.serializer()} is used;
+	\item  During the deserialization process, the JSON string is parsed, looking for the \textit{``type"} discriminator. Once it is found, the compiler knows what is the concrete class of the object and can use its constructor to recreate the object as it was before serialization using the values of the fields of the JSON string as parameters. The recreated objects however must be of type \kotlin{Any}. The type of the container is always valid, as any object that is non-nullable is subclass of \kotlin{Any}.
+	\begin{warn}[Polymorphic Serializers in Ktor:]
+		The JVM Server was implemented using the Ktor framework, in which it is possible to incorporate modules that instruct the server endpoints to automatically use serializers if the object to be transmitted is an instance of a serializable class. This process is similarly applicable on the client side using Ktor Client APIs.
+		By configuring some content negotiation parameters, the serialization strategy and the handling of format is completely delegated to the Ktor framework. However, a challenge arises with the \kotlin{EnvironmentSurrogate} class, which necessitates a specific Polymorphic serializer due to its two type parameters. Unfortunately, Ktor does not currently support Polymorphic serializers when it comes to content negotiation. As a result, the \kotlin{EnvironmentSurrogate} must be serialized manually before transmission. This also prohibits Ktor from dynamically selecting the format. As a possible solution, one could create a function that verifies the content negotiation strategy in use and adjusts the \kotlin{EnvironmentSurrogate} serialization API accordingly.
+	\end{warn}
+\end{itemize}
 \section{State Management with ReduxKotlin}
 \label{sec:state-management-with-reduxkotlin}
+ReduxKotlin~\cite{ReduxKot86:online} is a library for managing application state in a predictable and efficient manner. It is a port of the popular JavaScript library Redux~\cite{ReduxApr44:online}, which was designed to work with React, to the Kotlin programming language. The KotlinRedux library has been used to manage the state of both the Kotlin/JVM and Kotlin/JS modules in the project. Initially, it was intended to be used only in the Client side since the original Redux library is typically used in JavaScript environments. In JVM languages it is more likely to use other patterns. However, it was later decided to use KotlinRedux on the Server as well, in order to simplify state management across the project and maintain a consistent pattern throughout, to avoid confusion and make it easier for developers to work on the project.
+
 \subsection{Data Stores, Reducers and Actions}
 \label{ssec:data-stores-reducers-and-actions}
+In ReduxKotlin, the state of the app is represented as a plain object, similar to a ``model." However, all its fields are defined as \kotlin{val} to prevent arbitrary changes, avoiding potential hard-to-debug issues. In the Alchemist Web Renderer project, classes that serve this purpose are named with the suffix ``State". By now, there are three classes of this type:
+\begin{itemize}
+	\item \textbf{CommonState}: a class that contains common components that both the Server and the Client should have. Only components written in Common Kotlin are allowed to be contained in this class for obvious reasons. The \kotlin{Renderer} instance is included in this class because every system requires access to the same copy of the renderer in order to produce consistent and identical results;
+	\item \textbf{ServerState}: the class that contains the state of the Server. Other than the renderer, the Server only need a reference to the \kotlin{Simulation} running, so it is possible to interact with it;
+	\item \textbf{ClientState}: the class that contains the state of the Client. It contains:
+	\begin{itemize}
+		\item a \kotlin{RenderMode} object that specify what strategy the client will use to retrieve the Environment;
+		\item a \kotlin{PlayButton} object that specify the form and behavior of the \textit{PlayButton} component;
+		\item a \kotlin{Bitmap} object representing the EnvironmentSurrogate as an image;
+		\item a \kotlin{StatusSurrogate} object that represent the current status of the Simulation.
+	\end{itemize}
+\end{itemize}
+
+\centerImage{figures/state.png}{State Management - UML Class Diagram}{state}{1}
+
+In order to alter the state, an action must be dispatched. An action is represented as a simple JavaScript object which describes the event that took place. This requirement to describe all changes as actions provides clarity on what is happening in the app. If anything changes, there should be a clear understanding of why it changed. In the Alchemist Web Renderer project most of the state changes because the user interacts with the UI. For simplicity and consistency, most of the Actions are named following the Java naming convention for setters. The name of most action is \kotlin{SetXxx} (uppercase initial letter as Actions are classes in Kotlin), where \kotlin{Xxx} is the name of the field that changes.\newline
+
+Finally, to tie the state and the actions together, a function called Reducer is needed. The function takes the current state and action as arguments, and returns the next state of the app.
+
+\section{React.js Development with Kotlin's Domain-Specific Language}
+\label{sec:react-js-development-with-kotlin-s-domain-specific-language}
+
+The Client component depends on the React.js framework, which is often used for building the client-side components of web applications. In a Kotlin/JS project, React can be imported using Gradle, which is a popular build automation system for Java and Kotlin projects. After adding the dependency the jsMain source set, it is possible to import React components to create the client-side of the web application.\newline
+
+The way components are defined resembles the one used in the Typesafe HTML DSL library. These kind of libraries use the power of Kotlin's type system to prevent common HTML-related errors, such as incorrect element nesting or misused attributes at compile-time. This helps developers write reliable and maintainable HTML templates with less effort. The Typesafe HTML DSL library and the React library share similarities in terms of component definition and API. However, the HTML DSL library include components that are just static browser DOM elements. On the other hand, React components are defined and rendered on the web page by a renderer component. All the rendering work is done through the JavaScript language. This dynamic approach allows React components to update and re-render in real-time, basing on changes that affects the underlying data. React elements are simple objects and have a low cost of creation.\newline
+
+\subsection{Integrating npm dependencies in Kotlin: Adapters as External Declarations}
+\label{ssec:integrating-npm-dependencies-in-kotlin-adapters-as-external-declarations}
+
+React is an excellent choice for building web applications for several reasons, one of which is the availability of a large number of npm dependencies. These dependencies provide a wealth of functionality and can save time and effort in implementing common features and functionalities. All dependencies in a Kotlin/JS projects can be managed using the Gradle plugin.\newline
+
+In the Alchemist Web Renderer project the only npm dependency for now is the \kotlin{react-bootstrap} library. \fullref{lst:npm} shows a line of code that imports library from npm~\cite{Usedepen41:online}.
+React Bootstrap~\cite{reactboo79:online} is a library that offers pre-made UI components for creating responsive web applications using the popular React.js framework. It is based on the well-known Twitter Bootstrap~\cite{Bootstra57:online} library, and it is designed for speed, accessibility, and usability, as it includes a variety of elements like buttons, forms, etc.\newline
+
+It is necessary to offer some sort of adapter for Javascript functions and components. This is caused by Kotlin being a statically typed language while JavaScript modules are typically dynamically typed. Such adapters are referred to as \textit{``external declarations"} in Kotlin. The \kotlin{external} keyword is involved in the creation of an adapter. This keyword is used to declare a platform-specific implementation for a function or property that is expected to be provided by a different module.\newline
+
+\lstinputlisting[
+float,
+language=Kotlin,
+caption={Integration of an npm dependency in Kotlin/JS},
+label={lst:npm},
+]{listings/npm.kt}
+
+\lstinputlisting[
+float,
+language=Kotlin,
+caption={Adapter for the React Bootstrap Navbar API},
+label={lst:adater},
+]{listings/Adapter.kt}
+
+An adapter for the Navbar component offered by the React Bootstrap library can be seen in \fullref{lst:adater}. The \kotlin{@JsModule} annotation denotes an external declaration that must be imported from native JavaScript library while the \kotlin{@JsNonModule} annotation denotes an external declaration that can be used without module system. In this context, the \kotlin{@JsName} annotation is used because the compiler produces mangled names for functions. In this case react components are imported as \textit{``default"}. The Navbar component adapter is defined using a set of props that comes directly from the original Navbar API. An exhaustive adapter should include all the props but in this case, only the \kotlin{bg} and \kotlin{variant} props are defined. The component can be defined using the DSL notation as demonstrated in \fullref{lst:adater-use}.\newline
+
+\lstinputlisting[
+float,
+language=Kotlin,
+caption={React Bootstrap Navbar in Kotlin},
+label={lst:adater-use},
+]{listings/AdapterUse.kt}
+
+The Navbar is just an example component used in the project, it is possible to create other adapters by referring to the original APIs of the various libraries' documentation. In \fullref{ssec:user-interface-components} a hierarchical structure of components was selected to define the web app structure. The same hierarchy is illustrated in \fullref{fig:components}, adorned with the lilac-shaded components that comes from the React Bootstrap library. The arrows declare a dependency of type composition.
+
+\centerImage{figures/UIcomponents.png}{UI Components Hierarchy with Adapters}{components}{0.8}
