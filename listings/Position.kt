@@ -1,0 +1,3 @@
+interface Position<P : Position<P>> : Serializable {
+    // ...
+}
