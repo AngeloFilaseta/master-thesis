@@ -192,6 +192,11 @@ label={lst:serializationmodule},
 The serialization operation, which is shown in \fullref{lst:serializationmoduleexample}, is pretty straightforward, as it is really similar to the one already shown in \fullref{lst:positionsurroateserialization}.
 However, in this case an instance of \kotlin{PolymorphicSerializer} for the base class \kotlin{Any} must be explicitly passed as the first parameter to the \kotlin{encodeToString()} function. If the parameter is missing, a \kotlin{SerializationException} is thrown, explaining that \textit{``A Serializer for class 'Any' is not found"}.\newline
 
+\begin{warn}[Polymorphic Serializers in Ktor:]
+	The JVM Server was implemented using the Ktor framework, in which it is possible to incorporate modules that instruct the server endpoints to automatically use serializers if the object to be transmitted is an instance of a serializable class. This process is similarly applicable on the client side using Ktor Client APIs.
+	By configuring some content negotiation parameters, the serialization strategy and the handling of format is completely delegated to the Ktor framework. However, a challenge arises with the \kotlin{EnvironmentSurrogate} class, which necessitates a specific Polymorphic serializer due to its two type parameters. Unfortunately, Ktor does not currently support Polymorphic serializers when it comes to content negotiation. As a result, the \kotlin{EnvironmentSurrogate} must be serialized manually before transmission. This also prohibits Ktor from dynamically selecting the format. As a possible solution, one could create a function that verifies the content negotiation strategy in use and adjusts the \kotlin{EnvironmentSurrogate} serialization API accordingly.
+\end{warn}
+
 \lstinputlisting[
 float,
 language=Kotlin,
@@ -203,10 +208,6 @@ Now, considering an object of type \kotlin{EnvironmentSurrogate<Any, PositionSur
 \begin{itemize}
 	\item During the serialization process, the  \kotlin{PolymorphicSerializer} is retrieved and used. The serializer will check for the type of the \kotlin{Any} objects contained inside the \kotlin{EnvironmentSurrogate}. The compiler is aware that the concrete type of the object is one of those contained in the set of the subclasses declared inside the concentration module. Once it is found, the object's properties are serialized into fields and the \textit{``type"} discriminator is added to the JSON string as well. If the type is not recognized or is absent, the \kotlin{EmptyConcentrationSurrogate.serializer()} is used;
 	\item  During the deserialization process, the JSON string is parsed, looking for the \textit{``type"} discriminator. Once it is found, the compiler knows what is the concrete class of the object and can use its constructor to recreate the object as it was before serialization using the values of the fields of the JSON string as parameters. The recreated objects however must be of type \kotlin{Any}. The type of the container is always valid, as any object that is non-nullable is subclass of \kotlin{Any}.
-	\begin{warn}[Polymorphic Serializers in Ktor:]
-		The JVM Server was implemented using the Ktor framework, in which it is possible to incorporate modules that instruct the server endpoints to automatically use serializers if the object to be transmitted is an instance of a serializable class. This process is similarly applicable on the client side using Ktor Client APIs.
-		By configuring some content negotiation parameters, the serialization strategy and the handling of format is completely delegated to the Ktor framework. However, a challenge arises with the \kotlin{EnvironmentSurrogate} class, which necessitates a specific Polymorphic serializer due to its two type parameters. Unfortunately, Ktor does not currently support Polymorphic serializers when it comes to content negotiation. As a result, the \kotlin{EnvironmentSurrogate} must be serialized manually before transmission. This also prohibits Ktor from dynamically selecting the format. As a possible solution, one could create a function that verifies the content negotiation strategy in use and adjusts the \kotlin{EnvironmentSurrogate} serialization API accordingly.
-	\end{warn}
 \end{itemize}
 \section{State Management with ReduxKotlin}
 \label{sec:state-management-with-reduxkotlin}
@@ -275,6 +276,6 @@ caption={React Bootstrap Navbar in Kotlin},
 label={lst:adater-use},
 ]{listings/AdapterUse.kt}
 
-The Navbar is just an example component used in the project, it is possible to create other adapters by referring to the original APIs of the various libraries' documentation. In \fullref{ssec:user-interface-components} a hierarchical structure of components was selected to define the web app structure. The same hierarchy is illustrated in \fullref{fig:components}, adorned with the lilac-shaded components that comes from the React Bootstrap library. The arrows declare a dependency of type composition.
+\centerImage{figures/UIcomponents.png}{UI Components Hierarchy with Adapters}{components}{0.7}
 
-\centerImage{figures/UIcomponents.png}{UI Components Hierarchy with Adapters}{components}{0.8}
+The Navbar is just an example component used in the project, it is possible to create other adapters by referring to the original APIs of the various libraries' documentation. In \fullref{ssec:user-interface-components} a hierarchical structure of components was selected to define the web app structure. The same hierarchy is illustrated in \fullref{fig:components}, adorned with the lilac-shaded components that comes from the React Bootstrap library. The arrows declare a dependency of type composition.
