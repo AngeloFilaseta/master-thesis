@@ -76,6 +76,13 @@ JSON objects do not have a fixed structure or defined set of fields. This can be
 
 The Java class shown in \fullref{lst:molecule} is one of the simplest \textit{alchemist-api} class. In this case, the \java{Molecule} interface is defining a contract for a class to have a \kotlin{getName()} method that returns the name of the \java{Molecule} as a String. For this example in particular, the inheritance of the \java{Dependency} interface can be ignored. It is impossible to use the \java{Molecule} interface in a Kotlin/JS project, because Java is not supported. A surrogate class can be created to use the \java{Molecule} information in a context which is not JVM based.
 
+\lstinputlisting[
+float,
+language=Java,
+caption={Molecule interface in the Alchemist Project},
+label={lst:molecule},
+]{listings/Molecule.java}
+
 \subsection{Surrogate Classes and Custom Serializers}
 \label{ssec:surrogate-classes-and-custom-serializers}
 
