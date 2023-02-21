@@ -38,8 +38,10 @@ The UML Component Diagram is optimal for visualizing the high level architecture
 	\item \textbf{Everything in Browser approach}: this case is a bit more problematic in terms of implementation because the \textit{Renderer} module and the \textit{Client} module use a completely different technology stack that are not compatible with each other. The \textit{Transpiled Renderer} must be used, meaning that the existence of a \textit{Transpiler} which can generate the JS/TS component is a strict requirement for this solution to be considered feasible.
 	By taking this for granted, the \textit{Server} module can send a serialized form of the \textit{Environment} to the \textit{Client} module (even Java serialization is fine). Eventually, the Client will create the image and make it visible on the front-end.
 \end{itemize}
+\sectionmark{Comparative Study of Transpilation [...]}
 \section{Comparative Study of Transpilation Technologies and Alternatives}
 \label{sec:comparative-study-of-transpilation-technologies-and-alternatives}
+\sectionmark{Comparative Study of Transpilation [...]}
 With so many transpilers available, it can be overwhelming to choose the right one for the project.  To ensure that the best choice is made, a comparative study was conducted to evaluate the strengths and weaknesses of each transpiler.  Through this analysis, conclusions were drawn to determine the most suitable option for this project. These are the technologies that were taken into consideration for the creation of the first PoC:
 \begin{itemize}
 	\item \textbf{DoppioJVM}: an open-source project that aims to provide a fully-featured Java Virtual Machine (JVM) written entirely in JavaScript;
