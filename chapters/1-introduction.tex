@@ -64,7 +64,7 @@ The Alchemist simulator already uses some GUI systems, including the \textit{alc
 
 The desire is to build a new display and remote control system for Alchemist. As already mentioned, the simulator runs on the JVM (it has parts in Java, Kotlin, Scala, and possibly even parts in Groovy). The long-standing problem, which has been pending for a while, is to have a very flexible render, capable of being dynamically moved from a client to a server machine.\newline
 
-\centerImage{figures/use-case.png}{UML Use Case Diagram}{use-case}{0.6}
+\centerImage{figures/use-case.pdf}{UML Use Case Diagram}{use-case}{0.6}
 
 The following is a detailed description of a use case that the desired system should satisfy:\newline
 
@@ -74,7 +74,7 @@ Generating an image starting from a structured indication can require a good amo
 
 \noindent A more detailed description of the two strategies is now given with the help of some images that shows the ordered interactions.  Note that there is a clear mapping with the two designs already illustrated in \fullref{ssec:exploring-feasible-designs-stadia-like-streaming-and-everything-in-browser}.\newline
 
-\centerImage{figures/stadia-approach.png}{Stadia-like Approach}{stadia-approach}{0.5}
+\centerImage{figures/stadia-approach.pdf}{Stadia-like Approach}{stadia-approach}{0.5}
 
 In a \textbf{Stadia-like} approach, shown in \fullref{fig:stadia-approach}, the Client would request a \textit{Renderer Environment}. In this case the Server will make the rendering computation by creating a visual representation of the Environment using the \textit{Environment State} offered by the Simulation API.
 After finishing the calculation, the result is sent back to the Client which can now make it visible for the user to see. The visual representation can be anything that may be visualized on a browser, such as a raster or a vector image. This approach is ideal when the client machine has very weak hardware capabilities and is not ideal when multiple thin clients are connected because the Server would generates lot of \textit{Rendered Environments} wasting a lot of resources.\newline
@@ -84,7 +84,7 @@ After finishing the calculation, the result is sent back to the Client which can
 	For example, a sub-strategy could be to send to the client a \textit{Rendered Environment}, which is not completely up to date with the current Environment State given that is was created for another client not too long prior. Although, it is still important to mention that in some cases, by sending an outdated version of the environment, the experience may not be suitable for the user desires. In particular circumstances, especially when it comes to simulation, it would be desirable not to lose a single event.
 \end{warn}
 
-\centerImage{figures/everything-in-browser-approach.png}{Everything in Browser Approach}{e-i-b-approach}{0.5}
+\centerImage{figures/everything-in-browser-approach.pdf}{Everything in Browser Approach}{e-i-b-approach}{0.5}
 
 In an \textbf{Everything in Browser} approach, shown in \fullref{fig:e-i-b-approach} things works differently. The Client would request the \textit{Environment State} to the server. After retrieving it from the Simulation API, the server sends it back. The client is now responsible for generating the \textit{Rendered Environment} which will be visualized on the browser after the computation, that requires the \textit{Environment State} as input, is over. This approach is ideal when the client machine has very good hardware capabilities. If all the clients were to use this approach, it would also be beneficial on the server side, as complex computations always happens on different machines. This approach should not be used by thin client machines, as the rendering operation would cost too much time, and it would be impossible to keep up with the \textit{Environment State} on the Server.\newline
 

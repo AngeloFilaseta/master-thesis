@@ -9,7 +9,7 @@ The project has been named ``Alchemist Web Renderer" because the main component 
 
 A UML component diagram representing the Architecture of the Alchemist Web Renderer project is presented in \fullref{fig:architecture-all}. The shown UML component diagram is meant to be a high-level representation of how the whole system works. It shows the major components and their interactions, it is not meant to provide detailed information about each component. Those will be explained in more detail later on, including every implementation details that may be relevant to understand the system's overall functionalities.\newline
 
-\centerImage{figures/architecture-all.png}{UML Component Diagram - Alchemist Web Renderer Architecture}{architecture-all}{0.7}
+\centerImage{figures/architecture-all.pdf}{UML Component Diagram - Alchemist Web Renderer Architecture}{architecture-all}{0.7}
 
 The four illustrated components are the following:
 \begin{itemize}
@@ -30,7 +30,7 @@ Common Kotlin code can be used across different platforms without modification. 
 \label{ssec:data-model}
 The \textit{Data Model} of the Alchemist Web Renderer project is primarily composed of Surrogate classes. More detailed explanation of what a surrogate class is and why the model was structured this way will be better explained in \fullref{ssec:surrogate-classes-and-custom-serializers}. For now, surrogate classes can be seen as a sort of twin classes of other classes that can not be used in the current context for determined motivations. The \textit{Data Model} is shown as a UML Class Diagram in \fullref{fig:data-model}.\newline
 
-\centerImage{figures/data-model.png}{UML Class Diagram - Data Model}{data-model}{1}
+\centerImage{figures/data-model.pdf}{UML Class Diagram - Data Model}{data-model}{1}
 
 Every Surrogate class shown can be seen as a simplified version of another class, for example \kotlin{EnvironmentSurrogate} is the Surrogate class of the original \kotlin{Environment} class and so on. An exact mapping is not always possible, some attributes may be moved elsewhere and little changes in their form may be required, but it most cases the surrogate class is pretty similar to the original one.\newline
 
@@ -50,7 +50,7 @@ Once more, the motivation for these choices are better explained in \fullref{cha
 
 The UML Class Diagram in \fullref{fig:renderer} shows the classes involved in the rendering operations.\newline
 
-\centerImage{figures/renderer-class.png}{UML Class Diagram - Renderer}{renderer}{0.5}
+\centerImage{figures/renderer-class.pdf}{UML Class Diagram - Renderer}{renderer}{0.5}
 
 The \kotlin{Renderer} interface is surely the most important one. Its intent is to generate a result starting from the information contained in an \kotlin{EnvironmentSurrogate} class. The interface is used to create specific implementations of different renderer components that may use different strategies for the creation of the final result. It is crucial to note that the templates in the diagram will then be translated into type parameters in the Kotlin programming language. The \kotlin{Renderer} interface presents the same type parameters of the \kotlin{EnvironmentSurrogate} with the addiction of \kotlin{R}, which is the type of the computed result.
 By representing it this way, the result of the \kotlin{render()} function can be bound to any class. In the image, an example is shown in the \kotlin{BitmapRenderer} class, which binds \kotlin{R} to the \kotlin{Bitmap} class. It is useful because a Renderer could return an image in a raster format by binding \kotlin{R} to an Array, or to an SVG or Base64 image by binding \kotlin{R} to a String.\newline
@@ -67,7 +67,7 @@ Kotlin/JVM code is limited to be used within a JVM, as it often heavily relies o
 \label{ssec:architecture}
 An UML Class Diagram representing the Server Architecture is shown in \fullref{fig:server}. A description of the architecture follows:
 
-\centerImage{figures/server-architecture.png}{UML Class Diagram - Server}{server}{1}
+\centerImage{figures/server-architecture.pdf}{UML Class Diagram - Server}{server}{1}
 
 \begin{itemize}
 	\item \textbf{Server}: It exposes some API Endpoints that are not represented in the class diagram but that are discussed in \fullref{ssec:api-endpoints}. In this architecture, the \kotlin{Server} class serves as the central component as it acts as a container for all other classes and provides operations through the API Endpoints. The \kotlin{Server} holds:
@@ -85,10 +85,10 @@ The \kotlin{Server} class has access to the most recent \kotlin{EnvironmentSurro
 	\item In the \textbf{Stadia-like} approach, the \textit{Server} obtains an \kotlin{EnvironmentSurrogate} and passes it as the input to the \textit{Renderer} component. The resulting output image would be then transmitted to the \textit{Client} upon request.
 	The UML Sequence diagram depicted in \fullref{fig:sequence-server} illustrates the various interactions starting with a client sending an HTTP request, culminating in the receipt of an array of integers that is then mapped back into an image, called Bitmap in this specific implementation.
 
-	\centerImage{figures/sequence-server.png}{UML Sequence Diagram - Stadia-like Approach}{sequence-server}{1}
+	\centerImage{figures/sequence-server.pdf}{UML Sequence Diagram - Stadia-like Approach}{sequence-server}{1}
 
 	\item In the \textbf{Everything in Browser} approach the \textit{Server} simply needs to transmit a serialized form of the \kotlin{EnvironmentSurrogate} to the \textit{Client}. As outlined in \fullref{sec:serialization-with-kotlinx-serialization}, this is a straightforward process because the surrogate classes are composed of fields of simple data types that can easily be converted into a string format. The \textit{Client} would then be responsible of rendering the \kotlin{EnvironmentSurrogate}. The interactions are, once again, shown in the UML Sequence diagram in \fullref{fig:sequence-client}.
-	\centerImage{figures/sequence-client.png}{UML Sequence Diagram - Everything in Browser Approach}{sequence-client}{0.8}
+	\centerImage{figures/sequence-client.pdf}{UML Sequence Diagram - Everything in Browser Approach}{sequence-client}{0.8}
 \end{itemize}
 The light-gray shade represents components that are located on the same machine and are written in the same programming language.
 \subsection{API Endpoints}
@@ -148,12 +148,12 @@ Kotlin/JS enables to transpile Kotlin code to Javascript. It also provides the c
 
 A wireframe was used to design the user interface for the Alchemist Web Renderer project. That is a low-fidelity representation of a user interface design. It typically includes the layout of content, the positioning of buttons and other components, and the flow between various screens of a web page or application. Before creating a more polished, high-fidelity prototype, wireframes act as a road-map for the development process and helps visualizing and approving the design. The designed wireframe can be viewed in \fullref{fig:wireframe}.\newline
 
-\centerImage{figures/wireframe.png}{Wireframe of the User Interface}{wireframe}{1}
+\centerImage{figures/wireframe.pdf}{Wireframe of the User Interface}{wireframe}{1}
 
 The User Interface (UI) should now be divided into a component hierarchy. The first step is to label every component (and sub-component) in the wireframe by drawing boxes around them.
 According to the Single Responsibility Principle, each software module should change only if there is one valid reason~\cite{CleanCod98:online}. This principle has been used here to define what a component is. A component should ideally perform just one task. If it ends up growing, it may be necessary to break it down into smaller parts.
 
-\centerImage{figures/wireframe-h.png}{User Interface with Components Highlighting}{ui-highlighting}{1}
+\centerImage{figures/wireframe-h.pdf}{User Interface with Components Highlighting}{ui-highlighting}{1}
 
 As reported in \fullref{fig:ui-highlighting}, there are 4 main components in the App. Some of them are included inside others, as composition is a great way to reuse components if needed. The chosen names for the identified components are now listed, also describing what is the main task associated with each component.
 
