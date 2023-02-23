@@ -26,7 +26,7 @@ In order to provide some context, this chapter will briefly touch on what the Al
 	\centerImage{figures/reaction.png}{Alchemist Behavior in Terms of Reactions~\cite{TheAlche16:online}}{alchemist-reaction}{0.8}
 	\item \textbf{Condition}: A function that returns a boolean and a number starting from an \textit{Environment}. If the condition does not hold (i.e., its current output is false), the reaction to which it is associated cannot run.
 	The outputted number may or may not influence the reaction speed, depending on the reaction and its time distribution;
-	\item \textbf{Action}: Models a change in the \textbf{Environment}.
+	\item \textbf{Action}: Models a change in the \textit{Environment}.
 \end{itemize}
 \fullref{fig:alchemist-metamodel} depicts a visual representation of the model described.
 
@@ -77,7 +77,7 @@ Generating an image starting from a structured indication can require a good amo
 In a \textbf{Stadia-like} approach, shown in \fullref{fig:stadia-approach}, the Client would request a \textit{Renderer Environment}. In this case the Server will make the rendering computation by creating a visual representation of the Environment using the \textit{Environment State} offered by the Simulation API.
 After finishing the calculation, the result is sent back to the Client which can now make it visible for the user to see. The visual representation can be anything that may be visualized on a browser, such as a raster or a vector image. This approach is ideal when the client machine has very weak hardware capabilities and is not ideal when multiple thin clients are connected because the Server would generates lot of \textit{Rendered Environments} wasting a lot of resources.
 
-\centerImage{figures/stadia-approach.png}{Stadia Like Approach}{stadia-approach}{0.47}
+\centerImage{figures/stadia-approach.png}{Stadia-like Approach}{stadia-approach}{0.47}
 
 \begin{warn}[Note:]
 	Some sort of cache could be used to prevent resources wasting.
