@@ -17,7 +17,7 @@ There are ton of possibilities when creating an architecture. However there are 
 	\item The Renderer of the system must be as flexible as possible, it should run on a JVM and in a Web Environment at least. The most used languages for web development are Javascript and Web Assembly (Wasm).
 \end{itemize}
 
-The architecture design of the first proof of concept tries to reuse as much as possible the existing structures in the Alchemist codebase, shifting the issues of conversion and interoperability  onto the yet-to-exist renderer component. In this architecture idea the Renderer is a component (visualized as a UML Component in \fullref{fig:jvm-renderer}), written using a JVM language, which requires an \textit{Environment} and offers an \textit{Image} in any format depending on the implementation. It could be a raster image, or even better, any sort or scalable format, like an SVG string.
+The architecture design of the first proof of concept tries to reuse as much as possible the existing structures in the Alchemist codebase, shifting the issues of conversion and interoperability  onto the yet-to-exist renderer component. In this architecture idea the Renderer is a component, written using a JVM language, which requires an \textit{Environment} and offers an \textit{Image} in any format depending on the implementation. It could be a raster image, or even better, any sort or scalable format, like an SVG string. The Renderer can be visualized as a UML Component in \fullref{fig:jvm-renderer}.
 
 \centerImage{figures/jvmRendererComponent.png}{UML Component - JVM Renderer Component}{jvm-renderer}{0.5}
 
