@@ -15,7 +15,7 @@ Using the Alchemist Web Renderer, the same simulation can be monitored, an exapl
 
 At present, the project remains in its nascent stage, and a considerable number of features need to be incorporated. Some of these potential features are described in \fullref{sec:future-works}. The principal aim of this thesis was to establish a solid foundation that would facilitate the seamless addition of features in the future, while minimizing modifications in the existing architecture.\newline
 
-\centerImage{figures/performance-total.png}{Total time from request to visualization comparison}{performance-total}{0.6}
+\centerImage{figures/performance-total.png}{Performance Comparison - Total time from Request to Visualization}{performance-total}{0.6}
 
 At the current stage of development, profiling performance may not be a highly useful exercise, as there are numerous aspects of the project that can be improved. It is worth noting that the primary objective of this research was not to achieve optimal performance, which remains a significant challenge in this particular scenario. Therefore, the focus has been primarily on establishing a solid foundation that can facilitate the development of new features with relative ease, while addressing the known performance issues as development progresses.\newline
 
@@ -27,14 +27,14 @@ Along with some considerations, some data is still being presented. The graph de
 	\item \textbf{GPU}: 2nd Generation Core Processor Family Integrated Graphics Controller
 \end{itemize}
 
-\centerImage{figures/performance-render.png}{Render operation time comparison}{performance-render}{0.6}
+\centerImage{figures/performance-render.png}{Performance Comparison - Render Operation Time }{performance-render}{0.6}
 
 Two main pieces of information pop out from the graph. As it can be seen, there is a blatant linear dependency between the number of nodes in the environment and the time that is required for the operation to be accomplished. This behaviour is expected, as a growth in the cardinality of the data elements necessarily means more time needed in computational operations such as the serialization and rendering process.
 The Stadia like approach always requires an additional $\approx 1.5$ seconds compared to the Everything in Browser approach. This behavior is pretty unnatural, therefore the aim was to identify the underlying causes.\newline
 
 \fullref{fig:performance-render} shows the average time required for the completion of the render operation for each of the two different approaches. Note that the two operations require more or less the same time. Considering that in the Stadia apporach the render operation is achieved in a JVM, it is a fairly expected result for this strategy to be a little faster.\newline
 
-\centerImage{figures/performance-serialization.png}{Serialization time comparison}{performance-serialization}{0.6}
+\centerImage{figures/performance-serialization.png}{Performance Comparison - Serialization time}{performance-serialization}{0.6}
 
 \fullref{fig:performance-serialization} shows the differences in time of the two approaches in the serialization process executed by the Server. In the Everything in browser approach, the file to serialize is an \kotlin{EnvironmentSurrogate} class, while in the Stadia like approach it is a \kotlin{Bitmap}. The serialization of the surrogate classes is optimized, while the way the \kotlin{Bitmap} class is serialized could be improved. Nevertheless, the differences in time are rather unrelevant, as the values are very low and insignificant compared to the grand total.\newline
 
@@ -42,11 +42,11 @@ Finally, the differences in time for the deserialization operation are shown in 
 
 A table containing all the data that were used to render the graph is shown in \fullref{fig:performance-table}.\newline
 
-\centerImage{figures/performance-deserialization.png}{Deserialization time comparison}{performance-deserialization}{0.6}
+\centerImage{figures/performance-deserialization.png}{Performance Comparison - Deserialization time}{performance-deserialization}{0.6}
 
 In conclusion, this project thesis has successfully fulfilled its objective of creating a foundation for the future works of the Alchemist Web Renderer project, and provides a clear path forward for continued growth and progress.\newline
 
-\centerImage{figures/table.png}{Table of performance comparison}{performance-table}{1}
+\centerImage{figures/table.png}{Table of Performance Comparison}{performance-table}{1}
 
 \section{Future Works}
 \label{sec:future-works}

@@ -228,7 +228,7 @@ In ReduxKotlin, the state of the app is represented as a plain object, similar t
 	\end{itemize}
 \end{itemize}
 
-\centerImage{figures/state.png}{State Management - UML Class Diagram}{state}{1}
+\centerImage{figures/state.png}{UML Class Diagram - State Management}{state}{1}
 
 In order to alter the state, an action must be dispatched. An action is represented as a simple JavaScript object which describes the event that took place. This requirement to describe all changes as actions provides clarity on what is happening in the app. If anything changes, there should be a clear understanding of why it changed. In the Alchemist Web Renderer project most of the state changes because the user interacts with the UI. For simplicity and consistency, most of the Actions are named following the Java naming convention for setters. The name of most action is \kotlin{SetXxx} (uppercase initial letter as Actions are classes in Kotlin), where \kotlin{Xxx} is the name of the field that changes.\newline
 
