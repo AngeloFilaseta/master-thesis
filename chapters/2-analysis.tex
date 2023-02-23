@@ -44,10 +44,10 @@ The UML Component Diagram is optimal for visualizing the high level architecture
 \sectionmark{Comparative Study of Transpilation [...]}
 With so many transpilers available, it can be overwhelming to choose the right one for the project.  To ensure that the best choice is made, a comparative study was conducted to evaluate the strengths and weaknesses of each transpiler.  Through this analysis, conclusions were drawn to determine the most suitable option for this project. These are the technologies that were taken into consideration for the creation of the first PoC:
 \begin{itemize}
-	\item \textbf{DoppioJVM}: an open-source project that aims to provide a fully-featured Java Virtual Machine (JVM) written entirely in JavaScript;
-	\item \textbf{JSweet}: a Java to JavaScript transpiler that converts Java source code to JavaScript source code;
+	\item \textbf{DoppioJVM}: an open-source project that aims to provide a fully-featured Java Virtual Machine (JVM) written entirely in JavaScript~\cite{DoppioJV33:online};
+	\item \textbf{JSweet}: a Java to JavaScript transpiler that converts Java source code to JavaScript source code~\cite{JSweetat88:online};
 	\item \textbf{TeaVM}: a Java to JavaScript transpiler that translates Java bytecode to JavaScript;
-	\item \textbf{J2CL}: a Google-made transpiler that converts Java source code to JavaScript, using the Closure Library.
+	\item \textbf{J2CL}: a Google-made transpiler that converts Java source code to JavaScript, using the Closure Library~\cite{googlej257:online}.
 \end{itemize}
 All the listed technologies will be described in the following subsections. Although they are all good options in certain situations, none of them fulfilled the requirements of the Alchemist project. The motivations behind this choice are explained in the conclusions paragraph of each tool.
 \subsection{DoppioJVM}
@@ -55,7 +55,7 @@ All the listed technologies will be described in the following subsections. Alth
 Doppio is a JavaScript-based runtime system that enables the execution of unaltered general-purpose apps inside the browser. Two case studies have been used to illustrate the value of Doppio:
 \begin{itemize}
 	\item An \emph{Emscripten extension with Doppio} has been created to execute unmodified C++ application in the browser with full functionality;
-	\item \emph{DoppioJVM} is an interpreter written in Typescript that runs unmodified JVM programs directly in the browser.
+	\item \emph{DoppioJVM}~\cite{DoppioJV33:online} is an interpreter written in Typescript that runs unmodified JVM programs directly in the browser.
 \end{itemize}
 
 DoppioJVM can work with the JavaScript environment in addition to running programs that are entirely written in a JVM language. JavaScript snippets can be executed by JVM programs using the \kotlin{eval} method which DoppioJVM exposes. This method returns a JVM String, which is the operation's return value converted to string format. A JavaScript program can also use DoppioJVM to execute a JVM program similarly to how one would call Java on the command line through an API: the programmer specifies the classpath, main class, arguments, and, optionally, custom functions to reroute standard input and output~\cite{doppio}.\newline
@@ -108,7 +108,7 @@ Because of the above-mentioned reasons, it may be advisable to consider alternat
 
 \subsection{TeaVM}
 \label{ssec:teavm}
-TeaVM is a ahead-of-time compiler for Java bytecode that generates JavaScript and WebAssembly. The key difference from all the other transpiler is that TeaVM only requires compiled class files, not source code. For this reason, TeaVM can compile Kotlin and Scala, not just Java. TeaVM can be used in the following scenarios:
+TeaVM~\cite{TeaVM77:online} is a ahead-of-time compiler for Java bytecode that generates JavaScript and WebAssembly. The key difference from all the other transpiler is that TeaVM only requires compiled class files, not source code. For this reason, TeaVM can compile Kotlin and Scala, not just Java. TeaVM can be used in the following scenarios:
 \begin{itemize}
 	\item A web front-end is needed from scratch;
 	\item A Java-based back-end already exists and it is needed to integrate front-end code tightly into your existing development infrastructure;
@@ -138,7 +138,7 @@ TeaVM is a ahead-of-time compiler for Java bytecode that generates JavaScript an
 \label{ssec:j2cl}
 Google Web Toolkit (GWT) is a development toolkit for building and optimizing complex browser-based applications. In early 2015, the Google GWT team faced a significant challenge when they realized that the current trend in the web ecosystem and the demands of their internal customers required a new approach to Java on the Web. To address this, they made the difficult decision of developing a new product that would better align with the larger technology stack and meet the needs of their customers.\newline
 
-J2CL (Closure Compiler) is the new transpiler for Java made by Google that allows to convert Java code to JavaScript. J2CL works by taking Java source code and transforming it into equivalent JavaScript code that can be executed in a web browser or in other JavaScript runtime environments. J2CL uses the Closure Compiler, which performs optimizations on the generated code to make it more compact and efficient. J2CL also provides a Java-like runtime environment that emulates the behavior of Java classes in JavaScript, so that Java code can run in the browser as if it were running on the JVM. This allows developers to write Java code and reuse existing Java libraries, while still taking advantage of the reach and flexibility of the web.
+J2CL (Closure Compiler)~\cite{googlej257:online} is the new transpiler for Java made by Google that allows to convert Java code to JavaScript. J2CL works by taking Java source code and transforming it into equivalent JavaScript code that can be executed in a web browser or in other JavaScript runtime environments. J2CL uses the Closure Compiler, which performs optimizations on the generated code to make it more compact and efficient. J2CL also provides a Java-like runtime environment that emulates the behavior of Java classes in JavaScript, so that Java code can run in the browser as if it were running on the JVM. This allows developers to write Java code and reuse existing Java libraries, while still taking advantage of the reach and flexibility of the web.
 
 \paragraph{Strenghts} J2CL has some notable qualities:
 \begin{itemize}
