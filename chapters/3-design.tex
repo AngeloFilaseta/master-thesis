@@ -28,7 +28,13 @@ The four illustrated components are the following:
 Common Kotlin code can be used across different platforms without modification. This means that components that are useful in different platforms are contained in a single shared codebase but can be used anywhere. In the context of the Alchemist Web Renderer project, the \textit{Data Model} and \textit{Render} components are written using Common Kotlin.
 \subsection{Data Model}
 \label{ssec:data-model}
-The \textit{Data Model} of the Alchemist Web Renderer project is primarily composed of Surrogate classes. More detailed explanation of what a surrogate class is and why the model was structured this way will be better explained in \fullref{ssec:surrogate-classes-and-custom-serializers}. For now, surrogate classes can be seen as a sort of twin classes of other classes that can not be used in the current context for determined motivations. The \textit{Data Model} is shown as a UML Class Diagram in \fullref{fig:data-model}.\newline
+The \textit{Data Model} of the Alchemist Web Renderer project is primarily composed of Surrogate classes. A surrogate class is used to serialize and deserialize another class (commonly a third-party class which cannot be accessed). It acts as a ``surrogate" for the original class, handling the serialization and deserialization process on behalf of the original class. Surrogate classes are often used when the original one is not directly serializable, either because:
+\begin{itemize}
+	\item It is not marked with a serialization annotation;
+	\item It has a complex internal state that cannot be easily serialized;
+	\item Third-party dependencies that does not support serialization are involved.
+\end{itemize}
+By using a surrogate class, it is also possible to customize the serialization process and selectively include or exclude certain fields or properties from the serialized representation of the original class. More detailed explanation of what a surrogate class is and why the model was structured this way will be better explained in \fullref{ssec:surrogate-classes-and-custom-serializers}. The \textit{Data Model} is shown as a UML Class Diagram in \fullref{fig:data-model}.\newline
 
 \centerImage{figures/data-model.pdf}{UML Class Diagram - Data Model}{data-model}{1}
 

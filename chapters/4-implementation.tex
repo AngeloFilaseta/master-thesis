@@ -88,14 +88,9 @@ label={lst:molecule},
 
 \subsection{Surrogate Classes and Custom Serializers}
 \label{ssec:surrogate-classes-and-custom-serializers}
+In \fullref{ssec:data-model}, the objective of Surrogate classes has been elucidated. Now, further details will be provided on how the architecture handles these types of classes.\newline
 
-A surrogate class is used to serialize and deserialize another class (commonly a third-party class which cannot be accessed). It acts as a ``surrogate" for the original class, handling the serialization and deserialization process on behalf of the original class. Surrogate classes are often used when the original one is not directly serializable, either because:
-\begin{itemize}
-	\item It is not marked with a serialization annotation;
-	\item It has a complex internal state that cannot be easily serialized;
-	\item Third-party dependencies that does not support serialization are involved.
-\end{itemize}
-By using a surrogate class, it is also possible to customize the serialization process and selectively include or exclude certain fields or properties from the serialized representation of the original class. A valid surrogate class for the \kotlin{Molecule} class is shown in \fullref{lst:moleculeSurrogate}. \fullref{lst:serializingMoleculeSurrogate} also shows the corresponding JSON string associated with the created object.\newline
+A valid surrogate class for the \kotlin{Molecule} class is shown in \fullref{lst:moleculeSurrogate}. \fullref{lst:serializingMoleculeSurrogate} also shows the corresponding JSON string associated with the created object.\newline
 
 The remaining step is the creation of a mapping function that can translate the content from a \kotlin{Molecule} to a \kotlin{MoleculeSurrogate}. In Kotlin, an extension function that extends the \kotlin{Molecule} class with a new function called \kotlin{toMoleculeSurrogate()} can be created. Extension functions allow to add new functions to a class without using inheritance or any type of design pattern such as decorator. \fullref{lst:toMoleculeSurrogate} shows how the extension function can be created. The function takes no input arguments and returns an instance of the \kotlin{MoleculeSurrogate} class, which is initialized with the name property of the \kotlin{Molecule} instance that the function is being called on.\newline
 \lstinputlisting[
@@ -230,7 +225,7 @@ In ReduxKotlin, the state of the app is represented as a plain object, similar t
 		\item a \kotlin{StatusSurrogate} object that represent the current status of the Simulation.
 	\end{itemize}
 \end{itemize}
-The described structure is also represented in \fullref{fig:state}.\newline
+The described structure is also represented in \fullref{fig:state}.
 
 \centerImage{figures/state.pdf}{UML Class Diagram - State Management}{state}{1}
 
