@@ -23,35 +23,35 @@ In order to provide some context, this chapter will briefly touch on what the Al
 		\item A time distribution.
 	\end{itemize}
 	A visual representation of how a Reaction work is proposed in \fullref{fig:alchemist-reaction};
-	\centerImage{figures/reaction.png}{Alchemist Behavior in Terms of Reactions~\cite{TheAlche16:online}}{alchemist-reaction}{0.8}
+	\centerImage{figures/reaction.png}{Alchemist Behavior in Terms of Reactions}{alchemist-reaction}{0.8}
 	\item \textbf{Condition}: A function that returns a boolean and a number starting from an \textit{Environment}. If the condition does not hold (i.e., its current output is false), the reaction to which it is associated cannot run.
 	The outputted number may or may not influence the reaction speed, depending on the reaction and its time distribution;
 	\item \textbf{Action}: Models a change in the \textit{Environment}.
 \end{itemize}
-\fullref{fig:alchemist-metamodel} depicts a visual representation of the model described.
+\fullref{fig:alchemist-metamodel} depicts a visual representation of the model describe  \footnote{https://alchemistsimulator.github.io/}.
 
-\centerImage{figures/model.png}{The Alchemist Simulator Metamodel~\cite{TheAlche16:online}}{alchemist-metamodel}{1}
+\centerImage{figures/model.png}{The Alchemist Simulator Metamodel}{alchemist-metamodel}{1}
 
 \paragraph{Incarnations} The names in the metamodel are modeled after classical chemical words. This is primarily due to Alchemist's origins as a chemical-oriented multi-compartment stochastic simulation engine capable of supporting compartment (node) mobility while maintaining good performance. Alchemist's capabilities are not restricted to this. While in chemistry, Molecule and Concentration have highly specific definitions, in Alchemist, their concept can be generalized. An \textit{Incarnation} in Alchemist includes a type definition of concentration and possibly a set of specific conditions, actions and, possibly but rarely, environments and reactions that operate on such types. In other words, an Incarnation is a concrete instance of the Alchemist metamodel.\newline
 Different \textit{Incarnations} can represent vastly different universes. By now, Alchemist supports the following Incarnations:
 \begin{itemize}
-	\item \textbf{SAPERE Incarnation}: The simulator's first stable incarnation. It was developed in the context of the SAPERE EU project~\cite{SAPEREon48:online}. The core of SAPERE is the concept of Live Semantic Annotation (LSA), which is a description of a resource (for example a sensor, service, actuator, etc.) that always maps the current resource status (could be considered a prelude to the currently famous digital twin concept);
-	\item \textbf{Protelis Incarnation}: Protelis~\cite{Protelis97:online} is a language. Its goal is to make it easier to build a resilient and well-behaved networked system out of a variety of potentially mobile devices. Protelis is intended for the ``aggregate programming" paradigm, which is a way of thinking about and decomposing problems that can be solved using a network of distributed sensors and computers;
-	\item \textbf{Biochemistry Incarnation}: An Alchemist incarnation that was created to provide support for biochemical reactions which occur inside a biological cell or a group of cells that share a common environment~\cite{Biochemi16:online};
-	\item \textbf{SCAFI Incarnation}: ScaFi~\cite{ScaFiAgg69:online} (Scala Fields) is a Scala-based Aggregate Programming library and framework. It implements a variant of the Higher-Order Field Calculus (HOFC) operational semantics and provides a platform and API for simulating and executing Aggregate Computing systems and applications.
+	\item \textbf{SAPERE Incarnation}: The simulator's first stable incarnation. It was developed in the context of the SAPERE EU project~\cite{sapere}. The core of SAPERE is the concept of Live Semantic Annotation (LSA), which is a description of a resource (for example a sensor, service, actuator, etc.) that always maps the current resource status (could be considered a prelude to the currently famous digital twin concept);
+	\item \textbf{Protelis Incarnation}: Protelis~\cite{protelis} is a language. Its goal is to make it easier to build a resilient and well-behaved networked system out of a variety of potentially mobile devices. Protelis is intended for the ``aggregate programming" paradigm, which is a way of thinking about and decomposing problems that can be solved using a network of distributed sensors and computers;
+	\item \textbf{Biochemistry Incarnation}: An Alchemist incarnation that was created to provide support for biochemical reactions which occur inside a biological cell or a group of cells that share a common environment\footnote{https://alchemistsimulator.github.io/explanation/biochemistry/};
+	\item \textbf{SCAFI Incarnation}: ScaFi~\cite{CASADEI2022101248} (Scala Fields) is a Scala-based Aggregate Programming library and framework. It implements a variant of the Higher-Order Field Calculus (HOFC) operational semantics and provides a platform and API for simulating and executing Aggregate Computing systems and applications.
 \end{itemize}
 
 \subsection{Exploring Feasible Designs: Stadia-like Streaming and Everything in Browser}
 \label{ssec:exploring-feasible-designs-stadia-like-streaming-and-everything-in-browser}
 \paragraph{Google Stadia} A cloud-based gaming platform called Stadia was created by the Google company. It enables users to play video games without the need of owning expensive hardware or top-tier graphics cards. The games audiovisual (AV) data are broadcasted back over the internet by powerful servers once the user input is received and processed.\newline
 
-\centerImage{figures/stadia-topology.png}{Google Stadia Topology~\cite{AFirstLo55:online}}{stadia-topology}{0.8}
+\centerImage{figures/stadia-topology.png}{Google Stadia Topology}{stadia-topology}{0.8}
 
 Thanks to Stadia architecture, users can play high-end games on computers or even mobile devices that would not typically be able to run them.\newline
 
 To deliver the game content to the user, the system combines cloud computing, streaming technology, and data compression. The architecture works similarly to a streaming service, with the exception that data is bidirectional, with inputs flowing from the player and the provider streaming AV data which are a direct results of these inputs.\newline
 
-In a traditional multiplayer setup, players' actions are typically sent to a server or directly to other players' devices to update the game state via P2P. With Stadia, however, the architecture shifts to a centralized, local, big network, also shown in \fullref{fig:stadia-topology}. This means that instead of sending information over the public internet, Stadia instances communicate directly with one another within the same network. As a result, the server is the only component that actively processes game data, while the user's device simply receives the information passively~\cite{AFirstLo55:online}.
+In a traditional multiplayer setup, players' actions are typically sent to a server or directly to other players' devices to update the game state via P2P. With Stadia, however, the architecture shifts to a centralized, local, big network, also shown in \fullref{fig:stadia-topology}. This means that instead of sending information over the public internet, Stadia instances communicate directly with one another within the same network. As a result, the server is the only component that actively processes game data, while the user's device simply receives the information passively\footnote{https://dzone.com/articles/a-first-look-at-google-stadia}.
 
 \paragraph{Everything in Browser} This strategy refers to a design philosophy in which an application's user interface, logic, and data storage are all executed entirely within a web browser, almost independent of any external servers or dependencies. This enables a user experience that is easier to use and more seamless, as well as better offline functionality and increased security. This can be often achieved through the use of JavaScript and related technologies, like the WebAssembly (or Wasm) programming language.\newline
 
