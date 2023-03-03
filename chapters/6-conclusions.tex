@@ -40,13 +40,9 @@ The Stadia-like approach always requires an additional $\approx 1.5$ seconds com
 
 Finally, the differences in time for the deserialization operation are shown in the graph in Figure \fullref{fig:performance-deserialization}. It is now clear that the real divergences in performance is caused by the deserialization operation. This is somewhat unnatural, as the image that the client needs to deserialize is always of the same size and the quantity of nodes should be irrilevant. This is almost certainly caused by the deserialization technique that was used, as the library used for the rendering operation does not offer very good API for obtaining the image in a compact serializable format. This problem is remarked in \fullref{sec:future-works}. Fortunately, the performance issue is not related to the entire system architecture but rather to a specific implementation detail.\newline
 
-A table containing all the data that were used to render the graph is shown in \fullref{fig:performance-table}.\newline
-
 \centerImage{figures/performance-deserialization.png}{Performance Comparison - Deserialization time}{performance-deserialization}{0.6}
 
 In conclusion, this project thesis has successfully fulfilled its objective of creating a foundation for the future works of the Alchemist Web Renderer project, and provides a clear path forward for continued growth and progress.\newline
-
-\centerImage{figures/table.pdf}{Table of Performance Comparison}{performance-table}{1}
 
 \section{Future Works}
 \label{sec:future-works}
