@@ -7,7 +7,7 @@ The goal to reach is evident, however, creating a solution for the problem is pr
 
 Since the solution to the problem is not clear, the first step in the development process is to create a working proof of concept. A \textbf{Proof of Concept (PoC)} is an incomplete or rough version of a certain project or method. This is commonly used when it is necessary to verify that a certain idea is feasible from a technical point of view, for example when a new technology is needed and success is uncertain.\newline
 
-Generally, in a PoC it would be necessary to postpone as much as possible the technical aspects, but in this case it is better to understand right away how risky these technical aspects could be. Choosing a specific technology is a very important condition of satisfaction. The whole system is not created, however an effort is made to minimize the work by trying to understand what the critical points are. An example could be that of creating and applying the uncertain algorithm by using data that are not necessarily part of the domain of interest. The risk is reduced when, analyzing the performance, good results are obtained. The key point is the minimization of work, but it is necessary to simulate the system in such a way that it is as close as possible to the real one~\cite{slides-scoping}.\newline
+Generally, in a PoC it would be necessary to postpone as much as possible the technical aspects, but in this case it is better to understand right away how risky these technical aspects could be. Choosing a specific technology is a very important condition of satisfaction. The whole system is not created, however an effort is made to minimize the work by trying to understand what the critical points are. An example could be that of creating and applying the uncertain algorithm by using data that are not necessarily part of the domain of interest. The risk is reduced when, analyzing the performance, good results are obtained. The key point is the minimization of work, but it is necessary to simulate the system in such a way that it is as close as possible to the real one\footnote{slides-scoping}.\newline
 
 There are ton of possibilities when creating an architecture. However there are some technological constraints that limit the number of possible solutions that can be designed:
 \begin{itemize}
@@ -42,10 +42,10 @@ The UML Component Diagram is optimal for visualizing the high level architecture
 \sectionmark{Comparative Study of Transpilation [...]}
 With so many transpilers available, it can be overwhelming to choose the right one for the project.  To ensure that the best choice is made, a comparative study was conducted to evaluate the strengths and weaknesses of each transpiler.  Through this analysis, conclusions were drawn to determine the most suitable option for this project. These are the technologies that were taken into consideration for the creation of the first PoC:
 \begin{itemize}
-	\item \textbf{DoppioJVM}: an open-source project that aims to provide a fully-featured Java Virtual Machine (JVM) written entirely in JavaScript~\cite{DoppioJV33:online};
-	\item \textbf{JSweet}: a Java to JavaScript transpiler that converts Java source code to JavaScript source code~\cite{JSweetat88:online};
-	\item \textbf{TeaVM}: a Java to JavaScript transpiler that translates Java bytecode to JavaScript;
-	\item \textbf{J2CL}: a Google-made transpiler that converts Java source code to JavaScript, using the Closure Library~\cite{googlej257:online}.
+	\item \textbf{DoppioJVM}: an open-source project that aims to provide a fully-featured Java Virtual Machine (JVM) written entirely in JavaScript\footnote{http://doppiojvm.org};
+	\item \textbf{JSweet}: a Java to JavaScript transpiler that converts Java source code to JavaScript source code\footnote{https://www.jsweet.org/};
+	\item \textbf{TeaVM}: a Java to JavaScript transpiler that translates Java bytecode to JavaScript\footnote{https://teavm.org/};
+	\item \textbf{J2CL}: a Google-made transpiler that converts Java source code to JavaScript, using the Closure Library\footnote{https://github.com/google/j2cl}.
 \end{itemize}
 All the listed technologies will be described in the following subsections. Although they are all good options in certain situations, none of them fulfilled the requirements of the Alchemist project. The motivations behind this choice are explained in the conclusions paragraph of each tool.
 \subsection{DoppioJVM}
@@ -53,7 +53,7 @@ All the listed technologies will be described in the following subsections. Alth
 Doppio is a JavaScript-based runtime system that enables the execution of unaltered general-purpose apps inside the browser. Two case studies have been used to illustrate the value of Doppio:
 \begin{itemize}
 	\item An \emph{Emscripten extension with Doppio} has been created to execute unmodified C++ application in the browser with full functionality;
-	\item \emph{DoppioJVM}~\cite{DoppioJV33:online} is an interpreter written in Typescript that runs unmodified JVM programs directly in the browser.
+	\item \emph{DoppioJVM} is an interpreter written in Typescript that runs unmodified JVM programs directly in the browser.
 \end{itemize}
 
 DoppioJVM can work with the JavaScript environment in addition to running programs that are entirely written in a JVM language. JavaScript snippets can be executed by JVM programs using the \kotlin{eval} method which DoppioJVM exposes. This method returns a JVM String, which is the operation's return value converted to string format. A JavaScript program can also use DoppioJVM to execute a JVM program similarly to how one would call Java on the command line through an API: the programmer specifies the classpath, main class, arguments, and, optionally, custom functions to reroute standard input and output~\cite{doppio}.\newline
@@ -81,7 +81,7 @@ Summing up, if DoppioJVM is successful in providing a way to run Java code in a 
 Finally, even the simpler prototype of a Renderer component never worked on a web environment in the first place. Lots of Exception have been thrown, probably because of an incompatibility with some feature used by some Alchemist classes. The Exception stack-trace was never really clear about what the error was. All these difficulties in the early stages of the development, were a big red flag. Therefore, the idea of using the DoppioJVM library has been dropped rapidly.
 \subsection{JSweet}
 \label{ssec:jsweet}
-JSweet~\cite{JSweetat88:online} is a powerful tool that allows for code-to-code transpilation from Java to JavaScript. The transpilation process results in clean and readable JavaScript code that can be easily maintained and extended. With JSweet, developers can enjoy the benefits of JVM languages features, like strong type checking and familiar development tools, while still being able to target the web and interact with JavaScript libraries and APIs.
+JSweet is a powerful tool that allows for code-to-code transpilation from Java to JavaScript. The transpilation process results in clean and readable JavaScript code that can be easily maintained and extended. With JSweet, developers can enjoy the benefits of JVM languages features, like strong type checking and familiar development tools, while still being able to target the web and interact with JavaScript libraries and APIs.
 \paragraph{Strengths} Jsweet is a useful tool because of its many advantages:
 \begin{itemize}
 	\item\textbf{Object oriented and well-typed}: JSweet exploits Java's object-oriented features and strong type checking for efficient and error-free JavaScript programming with clear and organized code;
@@ -96,7 +96,7 @@ JSweet~\cite{JSweetat88:online} is a powerful tool that allows for code-to-code 
 \paragraph{Weaknesses and Limitations} Jsweet also lacks in some aspects:
 \begin{itemize}
 	\item \textbf{Sub-optimal mapping}: It is important to keep in mind that there is no exact replication of Java within JSweet and the output of a JSweet program is essentially a standard JavaScript program. This has its advantages, but it also means that there may be small variations in behavior compared to Java programs (i.e., JSweet cannot distinguish between a Long and an Int at runtime, affecting method overloading). However, JSweet strives to ensure that its programs behave similarly to Java programs in most cases, making it simple to run the same code on a JRE or in a JS container;
-	\item \textbf{Poor Library support}: Basic support for common Java APIs can be found in the J4TS~\cite{j4tsj4ts87:online} project. It is expected that more APIs will be supported in the future, however, it is impossible to cover all the libraries out there;
+	\item \textbf{Poor Library support}: Basic support for common Java APIs can be found in the J4TS\footnote{https://github.com/j4ts/j4ts} project. It is expected that more APIs will be supported in the future, however, it is impossible to cover all the libraries out there;
 	\item \textbf{Works only with Java}: JSweet does not rely on bytecode for the transpilation process. Only the Java syntax is supported and accepted as input, meaning that languages like Scala and Kotlin are not supported. This leads to the addition of an implementative requirement that results in a heavy constraint.
 \end{itemize}
 
@@ -106,7 +106,7 @@ Because of the above-mentioned reasons, it may be advisable to consider alternat
 
 \subsection{TeaVM}
 \label{ssec:teavm}
-TeaVM~\cite{TeaVM77:online} is a ahead-of-time compiler for Java bytecode that generates JavaScript and WebAssembly. The key difference from all the other transpiler is that TeaVM only requires compiled class files, not source code. For this reason, TeaVM can compile Kotlin and Scala, not just Java. TeaVM can be used in the following scenarios:
+TeaVM is a ahead-of-time compiler for Java bytecode that generates JavaScript and WebAssembly. The key difference from all the other transpiler is that TeaVM only requires compiled class files, not source code. For this reason, TeaVM can compile Kotlin and Scala, not just Java. TeaVM can be used in the following scenarios:
 \begin{itemize}
 	\item A web front-end is needed from scratch;
 	\item A Java-based back-end already exists and it is needed to integrate front-end code tightly into your existing development infrastructure;
@@ -134,9 +134,9 @@ TeaVM~\cite{TeaVM77:online} is a ahead-of-time compiler for Java bytecode that g
 \paragraph{Conclusions} In the context of the Alchemist project, it was determined that certain Java features were imperative for the desired functionality. Upon evaluation, it was found that TeaVM was not capable of supporting some of these crucial features. Furthermore, TeaVM was unable to meet the demands of all the necessary external dependencies required by the project. Consequently, it was chosen not to use TeaVM in the Alchemist project due to its obvious limitations.
 \subsection{J2CL}
 \label{ssec:j2cl}
-Google Web Toolkit (GWT)~\cite{GWT93:online} is a development toolkit for building and optimizing complex browser-based applications. In early 2015, the Google GWT team faced a significant challenge when they realized that the current trend in the web ecosystem and the demands of their internal customers required a new approach to Java on the Web. To address this, they made the difficult decision of developing a new product that would better align with the larger technology stack and meet the needs of their customers.\newline
+Google Web Toolkit (GWT)\footnote{https://www.gwtproject.org/} is a development toolkit for building and optimizing complex browser-based applications. In early 2015, the Google GWT team faced a significant challenge when they realized that the current trend in the web ecosystem and the demands of their internal customers required a new approach to Java on the Web. To address this, they made the difficult decision of developing a new product that would better align with the larger technology stack and meet the needs of their customers.\newline
 
-J2CL~\cite{googlej257:online} (Closure Compiler~\cite{googlecl76:online}) is the new transpiler for Java made by Google that allows to convert Java code to JavaScript. J2CL works by taking Java source code and transforming it into equivalent JavaScript code that can be executed in a web browser or in other JavaScript runtime environments. J2CL uses the Closure Compiler, which performs optimizations on the generated code to make it more compact and efficient. J2CL also provides a Java-like runtime environment that emulates the behavior of Java classes in JavaScript, so that Java code can run in the browser as if it were running on the JVM. This allows developers to write Java code and reuse existing Java libraries, while still taking advantage of the reach and flexibility of the web.
+J2CL (Closure Compiler\footnote{https://github.com/google/closure-compiler}) is the new transpiler for Java made by Google that allows to convert Java code to JavaScript. J2CL works by taking Java source code and transforming it into equivalent JavaScript code that can be executed in a web browser or in other JavaScript runtime environments. J2CL uses the Closure Compiler, which performs optimizations on the generated code to make it more compact and efficient. J2CL also provides a Java-like runtime environment that emulates the behavior of Java classes in JavaScript, so that Java code can run in the browser as if it were running on the JVM. This allows developers to write Java code and reuse existing Java libraries, while still taking advantage of the reach and flexibility of the web.
 
 \paragraph{Strenghts} J2CL has some notable qualities:
 \begin{itemize}
@@ -145,7 +145,7 @@ J2CL~\cite{googlej257:online} (Closure Compiler~\cite{googlecl76:online}) is the
 	\item \textbf{Road tested and trusted}: J2CL powers the most sophisticated GSuite applications developed by Google, including GMail, Inbox, Docs, Slides, and Calendar.
 \end{itemize}
 
-\paragraph{Weaknesses and Limitations} J2CL has some known and documented limitations~\cite{j2cllimi50:online}, including:
+\paragraph{Weaknesses and Limitations} J2CL has some known and documented limitations\footnote{https://github.com/google/j2cl/blob/master/docs/limitations.md}, including:
 \begin{itemize}
 	\item \textbf{Limited support on Java Libraries}: J2CL currently only supports a subset of the Java Standard Library. Consequently some Java libraries may not work as expected in the JavaScript environment;
 	\item \textbf{No support for Reflections}: J2CL does not provide support for \java{java.lang.reflect.*} or any type of runtime class introspection, including all methods on \java{java.lang.Class} that return \java{java.lang.reflect} objects;
@@ -165,14 +165,14 @@ J2CL~\cite{googlej257:online} (Closure Compiler~\cite{googlecl76:online}) is the
 
 One of the main advantages of Kotlin is its support for multiplatform programming. It helps in keeping the flexibility and advantages of native programming while cutting down on the effort spent writing and maintaining the same code for several platforms. Referring to \fullref{fig:kotlin-mp}:
 
-\centerImage{figures/kotlin-multiplatform.png}{Kotlin Multiplatform - Platforms~\cite{KotlinMu7:online}}{kotlin-mp}{0.5}
+\centerImage{figures/kotlin-multiplatform.png}{Kotlin Multiplatform - Platforms}{kotlin-mp}{0.5}
 
 \begin{itemize}
 	\item The language, basic tools, and core libraries are all part of \emph{Common Kotlin}. Common Kotlin code runs on all systems and is portable;
 	\item It is possible to use Kotlin platform-specific versions for platform interoperability. Extensions to the Kotlin language as well as platform-specific libraries and tools are included in the \emph{Kotlin/JVM}, \emph{Kotlin/JS}, and \emph{Kotlin/Native} platform-specific versions of the language. Through these platforms it is possible to access the platform native code (JVM, JS, and Native) and use all the native features.
 \end{itemize}
 
-Kotlin Multiplatform~\cite{KotlinMu7:online} may have many applications, but the following are some of the most prevalent ones:
+Kotlin Multiplatform\footnote{https://kotlinlang.org/docs/multiplatform.html} may have many applications, but the following are some of the most prevalent ones:
 
 \begin{itemize}
 	\item \textbf{Creating Android, iOS, and web apps}: By using shared code, the amount of business logic that front-end developers have to create is decreased. This improves the efficiency of product implementation while requiring less coding and testing for the specific platform;
@@ -180,19 +180,19 @@ Kotlin Multiplatform~\cite{KotlinMu7:online} may have many applications, but the
 	\item \textbf{Building a full-stack web app}: The two main targets are Kotlin/JVM (for the server) and Kotlin/JS (for the client). The shared code, mainly consists in the model of the application, but can also contains common logic that may run on both the server and the client.
 \end{itemize}
 
-Kotlin Multiplatform enables code sharing through its mechanisms. The source code is organized into source sets, each targeting a specific platform. \fullref{fig:kotlin-mp-sourcesets} shows the dependencies among source sets. As shown, if there is business logic that applies to all platforms, it can be shared in the common source set, eliminating the need to write the same code multiple times.
+Kotlin Multiplatform enables code sharing through its mechanisms. The source code is organized into source sets, each targeting a specific platform. \fullref{fig:kotlin-mp-sourcesets}\footnote{https://kotlinlang.org/docs/multiplatform--on-platforms.html} shows the dependencies among source sets. As shown, if there is business logic that applies to all platforms, it can be shared in the common source set, eliminating the need to write the same code multiple times.
 
-\centerImage{figures/sourcesets.png}{Kotlin Multiplatform - Source set dependencies~\cite{Sharecod25:online}}{kotlin-mp-sourcesets}{1}
+\centerImage{figures/sourcesets.png}{Kotlin Multiplatform - Source set dependencies}{kotlin-mp-sourcesets}{1}
 
 \subsection{Handling Third-Party Dependencies}
 \label{ssec:handling-third-party-dependencies}
-All softwares requires a collection of libraries to work smoothly. A Kotlin Multiplatform project could depend on multiplatform libraries that are compatible with all target platforms, platform-specific libraries, and even other multiplatform projects~\cite{Addingde33:online}.\newline
+All softwares requires a collection of libraries to work smoothly. A Kotlin Multiplatform project could depend on multiplatform libraries that are compatible with all target platforms, platform-specific libraries, and even other multiplatform projects~\footnote{https://kotlinlang.org/docs/multiplatform-add-dependencies.html}.\newline
 
 To include a library dependency, the build configuration must me modified. When using Gradle as the build tool, the target file is \textit{build.gradle(.kts)}, located in the shared directory of the project. It is possible to specify the required library dependency in the dependencies block using the appropriate type (e.g., \kotlin{implementation}, or \kotlin{api}).\newline
 
 Each source set is automatically dependent on the Kotlin standard library (stdlib). The platform-specific version of the library is used in the platform-specific source sets, while a common standard library is included in the remaining sets.
 
-\paragraph{Dependency on a Platform Specific Library} Libraries that are platform-specific must be specified in the correct source set block. It is impossible to set dependencies that are platform-specific libraries in the common source set. For example, since the Apache Common library~\cite{ApacheCo51:online} is not available for Javascript it can be added only to a \textit{jvmMain} source set.
+\paragraph{Dependency on a Platform Specific Library} Libraries that are platform-specific must be specified in the correct source set block. It is impossible to set dependencies that are platform-specific libraries in the common source set. For example, since the Apache Common library\footnote{https://commons.apache.org/} is not available for Javascript it can be added only to a \textit{jvmMain} source set.
 
 \paragraph{Dependency on a Multiplatform Library} Libraries that adopt Kotlin Multiplatform technology can be imported by specifying the dependency in the common source sets block. The platform-specific version of the library is automatically added to every source-set.
 
