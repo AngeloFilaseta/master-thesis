@@ -44,3 +44,58 @@ The application user interface is really poor in terms of content to display by 
 For the time being, the application has just undergone functional testing. This type of testing focuses on verifying that the application's features and functionality work as expected. This includes testing the application's inputs, outputs, and the interactions with other systems.\newline
 
 Since the UI is still not ready, performing UX testing may not be effective, as the design and layout of the application may change during development. Additionally, testing the usability of a UI that is not fully implemented may not provide an accurate representation of the final user experience. This is because UX testing involves evaluating the design and layout of the application, as well as the navigation and overall usability.
+
+\section{Performance Evaluation}
+\label{sec:performance-evaluation}
+At the current stage of development, profiling performance may not be a highly useful exercise, as there are numerous aspects of the project that can be improved. It is worth noting that the primary objective of this research was not to achieve optimal performance, which remains a significant challenge in this particular scenario. Therefore, the focus has been primarily on establishing a solid foundation that can facilitate the development of new features with relative ease, while addressing the known performance issues as development progresses.\newline
+
+Along with some considerations, some data is still being presented. The measurements were performed on a single machine, where both the Server and the Client components are located. The machine has limited hardware capabilities, and is characterized by the following specifications:
+
+\begin{itemize}
+	\item \textbf{Processor}: Intel(R) Core(TM) i5-2520M CPU @ 2.50GHz
+	\item \textbf{RAM}: 8GiB System memory
+	\item \textbf{GPU}: 2nd Generation Core Processor Family Integrated Graphics Controller
+\end{itemize}
+
+\paragraph{Free variables}
+The two free variable in the measurements are:
+\begin{enumerate}
+	\item the number of nodes $N$ ($N \in \mathbb{N}^{+}$) participating in the system, representing the size of the monitored system;
+	\item The utilized approach (Computation on Server or Computation on Server).
+\end{enumerate}
+\paragraph{Metrics}
+The four metrics measured to evaluate the performance of the system are:
+\begin{enumerate}
+	\item \textbf{rendering time}: the time required by the renderer component to complete its execution, this
+	metric is meant to compare the raw performance of the renderer across the available platforms. The execution on the JVM is expected to be faster than the one on the browser;
+	\item \textbf{serialization time}: the time required by the Server to serialize the \textit{Environment State} (in the Computation on Client approach) or the rendered image (in the Computation on Server approach). This operation is always accomplished by the Server;
+	\item \textbf{deserialization time}: the time required by the Client to deserialize the \textit{Environment State} (in the Computation on Client approach) or the rendered image (in the Computation on Server approach). This operation is always accomplished by the Client;
+	\item \textbf{total time}: the time required to complete an entire iteration, which includes all the previous metrics plus the network delay.
+\end{enumerate}
+
+Each metric is measured five times, and the presented results are an average of such data.
+
+\paragraph{Final Results}
+The results are presented and summarized in \fullref{fig:performace-graphs}. As anticipated, utilizing the Computation on Server approach yields more stable system performance as the monitored system expands. This is mainly due to the JVM's superior efficiency in comparison to Javascript. Additionally, the JVM is consistently faster in rendering the system and surprisingly quicker in converting the model into an image format than in plain JSON. Nevertheless, this is highly reliant on the specific serialization formats and libraries employed, and may drastically change with different implementations. Finally, it is apparent that adopting the Computation on Client approach is quite effective for minor systems, but it becomes less scalable than the Computation on Server strategy as the environment size expands.
+\begin{center}
+	\begin{figure}[htb]
+		\centering
+		\begin{subfigure}[t]{0.45\textwidth}
+			\includegraphics[width=0.99\textwidth]{figures/serialization-time}
+		\end{subfigure}%
+		~
+		\begin{subfigure}[t]{0.45\textwidth}
+			\includegraphics[width=0.99\textwidth]{figures/deserialization-time}
+		\end{subfigure}
+		~
+		\begin{subfigure}[t]{0.45\textwidth}
+			\includegraphics[width=0.99\textwidth]{figures/rendering-time}
+		\end{subfigure}
+		~
+		\begin{subfigure}[t]{0.45\textwidth}
+			\includegraphics[width=0.99\textwidth]{figures/total-time}
+		\end{subfigure}
+		\caption{Performance Evaluation - Comparison of the metrics in function of the free variables}
+		\label{fig:performace-graphs}
+	\end{figure}
+\end{center}
