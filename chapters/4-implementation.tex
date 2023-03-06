@@ -75,16 +75,11 @@ There is crucial problem considering the available codebase. The Alchemist Simul
 \end{itemize}
 
 There is another problem with using custom serializer in the project use case. Since the original structures are written using a JVM based language, the deserialization process can only work inside a JVM. This results in a compatibility problem, as existent classes cannot be used in the current project in a Kotlin/JS context. It would still be possible to navigate inside the Json Object created starting from the serialized string but this approach is also not desirable because accessing a JSON object can be much more difficult and tedious compared to accessing a structured class in a programming language.
-JSON objects do not have a fixed structure or defined set of fields. This can be more error-prone, especially if the JSON object is large or complex, or if there is not familiarity with the syntax of the JSON library being used. All of these information leads to the approach that has been used.\newline
+JSON objects do not have a fixed structure or defined set of fields. This can be more error-prone, especially if the JSON object is large or complex, or if there is not familiarity with the syntax of the JSON library being used. All of these information leads to the approach that has been used.
+
+\code{Java}{listings/Molecule.java}{Molecule Interface in the Alchemist Project}{molecule}
 
 The Java class shown in \fullref{lst:molecule} is one of the simplest \textit{alchemist-api} class. In this case, the \java{Molecule} interface is defining a contract for a class to have a \kotlin{getName()} method that returns the name of the \java{Molecule} as a String. For this example in particular, the inheritance of the \java{Dependency} interface can be ignored. It is impossible to use the \java{Molecule} interface in a Kotlin/JS project, because Java is not supported. A surrogate class can be created to use the \java{Molecule} information in a context which is not JVM based.
-
-\lstinputlisting[
-float,
-language=Java,
-caption={Molecule Interface in the Alchemist Project},
-label={lst:molecule},
-]{listings/Molecule.java}
 
 \subsection{Surrogate Classes and Custom Serializers}
 \label{ssec:surrogate-classes-and-custom-serializers}
@@ -93,26 +88,12 @@ In \fullref{ssec:data-model}, the objective of Surrogate classes has been elucid
 A valid surrogate class for the \kotlin{Molecule} class is shown in \fullref{lst:moleculeSurrogate}. \fullref{lst:serializingMoleculeSurrogate} also shows the corresponding JSON string associated with the created object.\newline
 
 The remaining step is the creation of a mapping function that can translate the content from a \kotlin{Molecule} to a \kotlin{MoleculeSurrogate}. In Kotlin, an extension function that extends the \kotlin{Molecule} class with a new function called \kotlin{toMoleculeSurrogate()} can be created. Extension functions allow to add new functions to a class without using inheritance or any type of design pattern such as decorator. \fullref{lst:toMoleculeSurrogate} shows how the extension function can be created. The function takes no input arguments and returns an instance of the \kotlin{MoleculeSurrogate} class, which is initialized with the name property of the \kotlin{Molecule} instance that the function is being called on.\newline
-\lstinputlisting[
-float,
-language=Kotlin,
-caption={MoleculeSurrogate Class},
-label={lst:moleculeSurrogate},
-]{listings/MoleculeSurrogate.kt}
 
-\lstinputlisting[
-float,
-language=Kotlin,
-caption={Serialization of a MoleculeSurrogate},
-label={lst:serializingMoleculeSurrogate},
-]{listings/SerializingMoleculeSurrogate.kt}
+\code{Kotlin}{listings/MoleculeSurrogate.kt}{MoleculeSurrogate Class}{moleculeSurrogate}
 
-\lstinputlisting[
-float,
-language=Kotlin,
-caption={MoleculeSurrogate's Mapping Function},
-label={lst:toMoleculeSurrogate},
-]{listings/ToMoleculeSurrogate.kt}
+\code{Kotlin}{listings/SerializingMoleculeSurrogate.kt}{Serialization of a MoleculeSurrogate}{serializingMoleculeSurrogate}
+
+\code{Kotlin}{listings/ToMoleculeSurrogate.kt}{MoleculeSurrogate's Mapping Function}{toMoleculeSurrogate}
 
 A surrogate class and its associated serialization and deserialization logic can be used on any platform, not just on the Java Virtual Machine (JVM). These steps must be repeated for every Alchemist data structure that must be serialized. Because of composition, most extension functions will use other objects' \kotlin{toXSurrogate()} to mutate their internal state into the corresponding surrogate classes.
 \subsection{Polymorphic Serialization}
@@ -137,12 +118,7 @@ Kotlin Serialization can also deal with polymorphic class hierarchies. This is u
 	There are several aspect to take in consideration using recursive bound, but to sum it up, the declaration \kotlin{Position<P: Position<P>>} can be described as: \kotlin{Position} is a generic type that can only be instantiated for its subtypes, and those subtypes will inherit some useful methods, some of which take subtype specific arguments (or otherwise depend on the subtype). It is worth noting that this type of notation is not always practical, as it can cause a type parameter explosion, and it also makes it harder to understand the relationship between types, hence it should be used with caution. Recursive bounds are very unpractical in serialization, as such, the surrogate classes of the position family are changed with a simpler structure without the recursive bounds.
 \end{info}
 
-\lstinputlisting[
-float,
-language=Kotlin,
-caption={Original Alchemist's Position Interface},
-label={lst:position},
-]{listings/Position.kt}
+\code{Kotlin}{listings/Position.kt}{Original Alchemist's Position Interface}{position}
 
 A sealed interface \kotlin{PositionSurrogate} is created. It declares two properties that subclasses must implement:
 \begin{itemize}
@@ -158,13 +134,7 @@ The small, but very important detail in this solution is related to static types
 
 In general, \textit{kotlinx.serialization} is designed to work correctly only when the compile-time type used during serialization is the same one as the compile-time type used during deserialization. This is not a problem, as the application that will deserialize the \kotlin{PositionSurrogate} object can always check the concrete type using the \kotlin{is} operator. A ``type" key is added to the resulting JSON object. The field is called \textit{discriminator} and it is used by the deserializer to map the object to the correct class.\newline
 
-\lstinputlisting[
-float,
-language=Kotlin,
-caption={Serialization of a PositionSurrogate},
-label={lst:positionsurroateserialization},
-]{listings/PositionSurrogateSerialization.kt}
-
+\code{Kotlin}{listings/PositionSurrogateSerialization.kt}{Serialization of a PositionSurrogate}{positionsurroateserialization}
 
 Considering an object of type \kotlin{EnvironmentSurrogate<Any, PositionSurrogate>}, here is what happens under the hood, considering only the second type parameter (\kotlin{PS}):
 \begin{itemize}
@@ -180,12 +150,7 @@ Since this kind of polymorphism is open, there is a possibility that subclasses 
 
 The additional configuration described, makes the code work just as it would with a \kotlin{sealed} class for the \kotlin{PS} type parameter, but in this case subclasses can be spread arbitrarily throughout the code. A default behavior was also provided. During the deserialization process, if the type is  absent or not recognized, the \kotlin{EmptyConcentrationSurrogate} is used. In other words, if a serialized JSON string does not respect the schema of any of the classes that were declared as subclasses inside the module, they will be mapped to an \kotlin{EmptyConcentrationSurrogate} object, which is basically an empty class.\newline
 
-\lstinputlisting[
-float,
-language=Kotlin,
-caption={Module for the Serialization of Concentrations},
-label={lst:serializationmodule},
-]{listings/SerializationModule.kt}
+\code{Kotlin}{listings/SerializationModule.kt}{Module for the Serialization of Concentrations}{serializationmodule}
 
 The serialization operation, which is shown in \fullref{lst:serializationmoduleexample}, is pretty straightforward, as it is really similar to the one already shown in \fullref{lst:positionsurroateserialization}.
 However, in this case an instance of \kotlin{PolymorphicSerializer} for the base class \kotlin{Any} must be explicitly passed as the first parameter to the \kotlin{encodeToString()} function. If the parameter is missing, a \kotlin{SerializationException} is thrown, explaining that \textit{``A Serializer for class 'Any' is not found"}.\newline
@@ -195,12 +160,7 @@ However, in this case an instance of \kotlin{PolymorphicSerializer} for the base
 	By configuring some content negotiation parameters, the serialization strategy and the handling of format is completely delegated to the Ktor framework. However, a challenge arises with the \kotlin{EnvironmentSurrogate} class, which necessitates a specific Polymorphic serializer due to its two type parameters. Unfortunately, Ktor does not currently support Polymorphic serializers when it comes to content negotiation. As a result, the \kotlin{EnvironmentSurrogate} must be serialized manually before transmission. This also prohibits Ktor from dynamically selecting the format. As a possible solution, one could create a function that verifies the content negotiation strategy in use and adjusts the \kotlin{EnvironmentSurrogate} serialization API accordingly.
 \end{warn}
 
-\lstinputlisting[
-float,
-language=Kotlin,
-caption={Serialization of a Concentration},
-label={lst:serializationmoduleexample},
-]{listings/SerializationModuleExample.kt}
+\code{Kotlin}{listings/SerializationModuleExample.kt}{Serialization of a Concentration}{serializationmoduleexample}
 
 Now, considering an object of type \kotlin{EnvironmentSurrogate<Any, PositionSurrogate>}, here is what happens under the hood, considering only the first type parameter (\kotlin{TS}):
 \begin{itemize}
@@ -252,28 +212,13 @@ React Bootstrap\footnote{https://react-bootstrap.github.io/} is a library that o
 
 It is necessary to offer some sort of adapter for Javascript functions and components. This is caused by Kotlin being a statically typed language while JavaScript modules are typically dynamically typed. Such adapters are referred to as \textit{``external declarations"} in Kotlin. The \kotlin{external} keyword is involved in the creation of an adapter. This keyword is used to declare a platform-specific implementation for a function or property that is expected to be provided by a different module.\newline
 
-\lstinputlisting[
-float,
-language=Kotlin,
-caption={Integration of an npm dependency in Kotlin/JS},
-label={lst:npm},
-]{listings/npm.kt}
+\code{Kotlin}{listings/npm.kt}{Integration of an npm dependency in Kotlin/JS}{npm}
 
-\lstinputlisting[
-float,
-language=Kotlin,
-caption={Adapter for the React Bootstrap Navbar API},
-label={lst:adater},
-]{listings/Adapter.kt}
+\code{Kotlin}{listings/Adapter.kt}{Adapter for the React Bootstrap Navbar API}{adapter}
 
-An adapter for the Navbar\footnote{https://react-bootstrap.github.io/components/navbar/\#api} component offered by the React Bootstrap library can be seen in \fullref{lst:adater}. The \kotlin{@JsModule} annotation denotes an external declaration that must be imported from native JavaScript library while the \kotlin{@JsNonModule} annotation denotes an external declaration that can be used without module system. In this context, the \kotlin{@JsName} annotation is used because the compiler produces mangled names for functions. In this case react components are imported as \textit{``default"}. The Navbar component adapter is defined using a set of props that comes directly from the original Navbar API. An exhaustive adapter should include all the props but in this case, only the \kotlin{bg} and \kotlin{variant} props are defined. The component can be defined using the DSL notation as demonstrated in \fullref{lst:adater-use}.\newline
+An adapter for the Navbar\footnote{https://react-bootstrap.github.io/components/navbar/\#api} component offered by the React Bootstrap library can be seen in \fullref{lst:adapter}. The \kotlin{@JsModule} annotation denotes an external declaration that must be imported from native JavaScript library while the \kotlin{@JsNonModule} annotation denotes an external declaration that can be used without module system. In this context, the \kotlin{@JsName} annotation is used because the compiler produces mangled names for functions. In this case react components are imported as \textit{``default"}. The Navbar component adapter is defined using a set of props that comes directly from the original Navbar API. An exhaustive adapter should include all the props but in this case, only the \kotlin{bg} and \kotlin{variant} props are defined. The component can be defined using the DSL notation as demonstrated in \fullref{lst:adapter-use}.\newline
 
-\lstinputlisting[
-float,
-language=Kotlin,
-caption={React Bootstrap Navbar in Kotlin},
-label={lst:adater-use},
-]{listings/AdapterUse.kt}
+\code{Kotlin}{listings/AdapterUse.kt}{React Bootstrap Navbar in Kotlin}{adapter-use}
 
 \centerImage{figures/UIcomponents.pdf}{UI Components Hierarchy with Adapters}{components}{0.7}
 

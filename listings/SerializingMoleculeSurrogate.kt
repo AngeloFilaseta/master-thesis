@@ -1,5 +1,3 @@
-val molecule: MoleculeSurrogate = MoleculeSurrogate(
-    "surrogate"
-)
+val molecule: MoleculeSurrogate = MoleculeSurrogate("surrogate")
 println(Json.encodeToString(molecule))
 //OUTPUT: {"name":"surrogate"}

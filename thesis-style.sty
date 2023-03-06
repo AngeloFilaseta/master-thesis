@@ -2,20 +2,18 @@
 \usepackage[\thesislang]{babel}
 
 % common utilities
-\usepackage{hyperref}
 \usepackage{graphicx}
-\usepackage{xcolor}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{latexsym}
 \usepackage{amsthm}
 \usepackage[\thesislang]{cleveref}
 \usepackage{geometry}
-\usepackage{listings}
 \usepackage{ifthen}
 
 % \usepackage[disable]{todonotes} % decommentare prima della versione finale
 \usepackage{todonotes} % commentare prima della versione finale
+
 \newcommand{\gcsidenote}[1]{\todo[size=\tiny,color=green]{\textbf{GC:} #1}}
 \newcommand{\gcnote}[1]{\todo[size=\scriptsize,color=green,inline]{\textbf{Giovanni Ciatto:} #1}}
 \newcommand{\dpsidenote}[1]{\todo[size=\tiny,color=red]{\textbf{DP:} #1}}
@@ -30,22 +28,22 @@
 \ifthenelse{\equal{italian}{\thesislang}}{
 	\newcommand{\acknowledgementsname}{Ringraziamenti}
 }{
-	\newcommand{\acknowledgementsname}{Acknowledgements}	
+	\newcommand{\acknowledgementsname}{Acknowledgements}
 }
 \ifthenelse{\equal{italian}{\thesislang}}{
 	\newcommand{\introductionname}{Introduzione}
 }{
-	\newcommand{\introductionname}{Introduction}	
+	\newcommand{\introductionname}{Introduction}
 }
 \ifthenelse{\equal{italian}{\thesislang}}{
 	\newcommand{\conclusionsname}{Conclusioni}
 }{
-	\newcommand{\conclusionsname}{Conclusions}	
+	\newcommand{\conclusionsname}{Conclusions}
 }
 
-\newenvironment{abstract}{\chapter*{\centering\abstractname}\addcontentsline{toc}{chapter}{\abstractname}}{} 
+\newenvironment{abstract}{\chapter*{\centering\abstractname}\addcontentsline{toc}{chapter}{\abstractname}}{}
 
-\newenvironment{acknowledgements}{\chapter*{\acknowledgementsname}}{} 
+\newenvironment{acknowledgements}{\chapter*{\acknowledgementsname}}{}
 
 \newenvironment{dedication}{\chapter*{}\begin{flushright}\itshape}{\normalfont\end{flushright}}
 
@@ -58,36 +56,6 @@
 \ifthenelse{\equal{italian}{\thesislang}}{
 	\crefname{lstlisting}{listing}{listato}
 }{
-	\crefname{lstlisting}{listing}{listing}	
+	\crefname{lstlisting}{listing}{listing}
 }
 \Crefname{lstlisting}{Listing}{\lstlistingname}
-
-\lstset{
-	showstringspaces=false,
-	basicstyle=\ttfamily,
-	commentstyle={\color{olive}},
-	identifierstyle=\color{black},
-	ndkeywordstyle={\color{blue}},
-	stringstyle={\color{magenta}},
-	emphstyle={},
-	keywordstyle={\color{blue}},
-	breaklines=true,
-	numbers=left,
-	numberstyle=\tiny\color{gray},
-	numbersep=10pt,
-	tabsize=2,
-	extendedchars=true,
-	frame=trBL,
-	frameround=fttt,
-}
-
-\lstdefinelanguage{Kotlin}{
-	comment=[l]{//},
-	emph={delegate, filter, first, firstOrNull, forEach, lazy, map, mapNotNull, println, return@},
-	keywords={abstract, actual, as, as?, break, by, class, companion, continue, data, do, dynamic, else, enum, expect, false, final, for, fun, get, if, import, in, interface, internal, is, null, object, override, package, private, public, return, set, super, suspend, this, throw, true, try, typealias, val, var, vararg, when, where, while},
-	morecomment=[s]{/*}{*/},
-	morestring=[b]",
-	morestring=[s]{"""*}{*"""},
-	ndkeywords={@Deprecated, @JvmField, @JvmName, @JvmOverloads, @JvmStatic, @JvmSynthetic, Array, Byte, Double, Float, Int, Integer, Iterable, Long, Runnable, Short, String, Unit, it},
-	sensitive=true
-}

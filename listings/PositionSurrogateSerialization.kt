@@ -1,5 +1,4 @@
-val position: PositionSurrogate =
-    Position2DSurrogate(0.0, 0.0)
+val position: PositionSurrogate = Position2DSurrogate(0.0, 0.0)
 println(Json.encodeToString(position))
 //OUTPUT {
 //    "type":"Position2DSurrogate",

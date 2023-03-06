@@ -63,3 +63,19 @@
 }
 
 \newcommand*{\fullref}[1]{\hyperref[{#1}]{\autoref*{#1} (\nameref*{#1})}}
+
+\newcommand*{\code}[4]{
+	\begin{listing}[htb]
+		\inputminted[
+		frame=lines,
+		framesep=2mm,
+		baselinestretch=1.2,
+		bgcolor=LightGray,
+		linenos
+		]{#1}{#2}
+		\caption{#3}
+		\label{lst:#4}
+	\end{listing}
+}
+
+\providecommand*{\listingautorefname}{Listing}
