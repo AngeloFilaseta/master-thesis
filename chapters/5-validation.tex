@@ -76,7 +76,7 @@ The four metrics measured to evaluate the performance of the system are:
 Each metric is measured five times, and the presented results are an average of such data.
 
 \paragraph{Final Results}
-The results are presented and summarized in \fullref{fig:performace-graphs}. As anticipated, utilizing the Computation on Server approach yields more stable system performance as the monitored system expands. This is mainly due to the JVM's superior efficiency in comparison to Javascript. Additionally, the JVM is consistently faster in rendering the system and surprisingly quicker in converting the model into an image format than in plain JSON. Nevertheless, this is highly reliant on the specific serialization formats and libraries employed, and may drastically change with different implementations. Finally, it is apparent that adopting the Computation on Client approach is quite effective for minor systems, but it becomes less scalable than the Computation on Server strategy as the environment size expands.
+The results are presented and summarized in \fullref{fig:performace-graphs}.
 \begin{center}
 	\begin{figure}[htb]
 		\centering
@@ -99,3 +99,5 @@ The results are presented and summarized in \fullref{fig:performace-graphs}. As 
 		\label{fig:performace-graphs}
 	\end{figure}
 \end{center}
+
+As anticipated, utilizing the Computation on Server approach yields more stable system performance as the monitored system expands. This is mainly due to the JVM's superior efficiency in comparison to Javascript. Additionally, the JVM is consistently faster in rendering the system and surprisingly quicker in converting the model into an image format than in plain JSON. Nevertheless, this is highly reliant on the specific serialization formats and libraries employed, and may drastically change with different implementations. Finally, it is apparent that adopting the Computation on Client approach is quite effective for minor systems, but it becomes less scalable than the Computation on Server strategy as the environment size expands.

@@ -56,12 +56,12 @@ Once more, the motivation for these choices are better explained in \fullref{cha
 
 The UML Class Diagram in \fullref{fig:renderer} shows the classes involved in the rendering operations.\newline
 
-\centerImage{figures/renderer-class.pdf}{UML Class Diagram - Renderer}{renderer}{0.5}
+\centerImage{figures/renderer-class.pdf}{UML Class Diagram - Renderer}{renderer}{1}
 
 The \kotlin{Renderer} interface is surely the most important one. Its intent is to generate a result starting from the information contained in an \kotlin{EnvironmentSurrogate} class. The interface is used to create specific implementations of different renderer components that may use different strategies for the creation of the final result. It is crucial to note that the templates in the diagram will then be translated into type parameters in the Kotlin programming language. The \kotlin{Renderer} interface presents the same type parameters of the \kotlin{EnvironmentSurrogate} with the addiction of \kotlin{R}, which is the type of the computed result.
 By representing it this way, the result of the \kotlin{render()} function can be bound to any class. In the image, an example is shown in the \kotlin{BitmapRenderer} class, which binds \kotlin{R} to the \kotlin{Bitmap} class. It is useful because a Renderer could return an image in a raster format by binding \kotlin{R} to an Array, or to an SVG or Base64 image by binding \kotlin{R} to a String.\newline
 
-A class implementing the \textit{Renderer} interface will likely depends on third-party libraries to be able to perform its functions more easily. It's essential to keep in mind that in this scenario, the library selection is constrained, as it must be a multi-platform library.
+A class implementing the \kotlin{Renderer} interface will likely depends on third-party libraries to be able to perform its functions more easily. It's essential to keep in mind that in this scenario, the library selection is constrained, as it must be a multi-platform library.
 
 \begin{info}[Note:]
 	The Renderer component can not use platform-specific libraries, making it unfeasible to use the full range of JavaScript-based libraries for image creation and animation. This is due to the requirement of running JavaScript code on the JVM server, which is not possible in the project's current state. Moreover, it's worth noting that the use of a transpiler is now more practical, as the dependency on original JVM Alchemist structures has been eliminated and replaced with straightforward surrogate classes that contains really basic data types. However, it is not the main goal for this thesis to discuss this topic.

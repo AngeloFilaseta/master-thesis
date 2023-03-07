@@ -85,13 +85,13 @@ The Java class shown in \fullref{lst:molecule} is one of the simplest \textit{al
 \label{ssec:surrogate-classes-and-custom-serializers}
 In \fullref{ssec:data-model}, the objective of Surrogate classes has been elucidated. Now, further details will be provided on how the architecture handles these types of classes.\newline
 
-A valid surrogate class for the \kotlin{Molecule} class is shown in \fullref{lst:moleculeSurrogate}. \fullref{lst:serializingMoleculeSurrogate} also shows the corresponding JSON string associated with the created object.\newline
-
-The remaining step is the creation of a mapping function that can translate the content from a \kotlin{Molecule} to a \kotlin{MoleculeSurrogate}. In Kotlin, an extension function that extends the \kotlin{Molecule} class with a new function called \kotlin{toMoleculeSurrogate()} can be created. Extension functions allow to add new functions to a class without using inheritance or any type of design pattern such as decorator. \fullref{lst:toMoleculeSurrogate} shows how the extension function can be created. The function takes no input arguments and returns an instance of the \kotlin{MoleculeSurrogate} class, which is initialized with the name property of the \kotlin{Molecule} instance that the function is being called on.\newline
-
 \code{Kotlin}{listings/MoleculeSurrogate.kt}{MoleculeSurrogate Class}{moleculeSurrogate}
 
+A valid surrogate class for the \kotlin{Molecule} class is shown in \fullref{lst:moleculeSurrogate}. \fullref{lst:serializingMoleculeSurrogate} also shows the corresponding JSON string associated with the created object.
+
 \code{Kotlin}{listings/SerializingMoleculeSurrogate.kt}{Serialization of a MoleculeSurrogate}{serializingMoleculeSurrogate}
+
+The remaining step is the creation of a mapping function that can translate the content from a \kotlin{Molecule} to a \kotlin{MoleculeSurrogate}. In Kotlin, an extension function that extends the \kotlin{Molecule} class with a new function called \kotlin{toMoleculeSurrogate()} can be created. Extension functions allow to add new functions to a class without using inheritance or any type of design pattern such as decorator. \fullref{lst:toMoleculeSurrogate} shows how the extension function can be created. The function takes no input arguments and returns an instance of the \kotlin{MoleculeSurrogate} class, which is initialized with the name property of the \kotlin{Molecule} instance that the function is being called on.\newline
 
 \code{Kotlin}{listings/ToMoleculeSurrogate.kt}{MoleculeSurrogate's Mapping Function}{toMoleculeSurrogate}
 
@@ -112,13 +112,13 @@ Kotlin Serialization can also deal with polymorphic class hierarchies. This is u
 
 \paragraph{Position Surrogate (PS)} The second type parameter is easier to treat, as a closed polymorphism strategy can be used for serialization. The original \kotlin{Position} interface used in Alchemist represents a position inside the \kotlin{Environment} and is defined as shown in \fullref{lst:position}.
 
+\code{Kotlin}{listings/Position.kt}{Original Alchemist's Position Interface}{position}
+
 \begin{info}[Recursive bounds in Surrogate Classes:]
 	The notation
 	\kotlin{<P: Position<P>>} in the type parameter definition is called a ``recursive bound" which means that the type parameter \textit{P} must implement or inherit from the class \kotlin{Position} itself. This is an example of a self-referential type, in which a class defines itself as a type parameter.
 	There are several aspect to take in consideration using recursive bound, but to sum it up, the declaration \kotlin{Position<P: Position<P>>} can be described as: \kotlin{Position} is a generic type that can only be instantiated for its subtypes, and those subtypes will inherit some useful methods, some of which take subtype specific arguments (or otherwise depend on the subtype). It is worth noting that this type of notation is not always practical, as it can cause a type parameter explosion, and it also makes it harder to understand the relationship between types, hence it should be used with caution. Recursive bounds are very unpractical in serialization, as such, the surrogate classes of the position family are changed with a simpler structure without the recursive bounds.
 \end{info}
-
-\code{Kotlin}{listings/Position.kt}{Original Alchemist's Position Interface}{position}
 
 A sealed interface \kotlin{PositionSurrogate} is created. It declares two properties that subclasses must implement:
 \begin{itemize}
@@ -128,13 +128,13 @@ A sealed interface \kotlin{PositionSurrogate} is created. It declares two proper
 These properties can also be found in the original \kotlin{Position} interface. By using the \kotlin{PositionSurrogate} interface it is possible to create surrogate classes for the classes that inherit from the original \kotlin{Position} class with ease. A \kotlin{GeneralPositionSurrogate} class is also created. It acts as a backup class that may be used if a surrogate class that fits a specific implementation on the Position class is not available.\newline
 
 The key point of the described structure is the \kotlin{sealed} keyword used to declare the \kotlin{PositionSurrogate} interface.
-The most straightforward way to use serialization with a polymorphic hierarchy, in fact, is to mark the base class/interface as \kotlin{sealed}. All the subclasses of that sealed class must be explicitly marked as \kotlin{@Serializable} for this solution to work. By using this structure it is now possible to serialize and deserialize objects of type \textit{PositionSurrogate} with ease, as shown in \fullref{lst:positionsurroateserialization}.\newline
+The most straightforward way to use serialization with a polymorphic hierarchy, in fact, is to mark the base class/interface as \kotlin{sealed}. All the subclasses of that sealed class must be explicitly marked as \kotlin{@Serializable} for this solution to work. By using this structure it is now possible to serialize and deserialize objects of type \textit{PositionSurrogate} with ease, as shown in \fullref{lst:positionsurroateserialization}.
+
+\code{Kotlin}{listings/PositionSurrogateSerialization.kt}{Serialization of a PositionSurrogate}{positionsurroateserialization}
 
 The small, but very important detail in this solution is related to static types. At compile-time, the object to serialize is declared as \kotlin{PositionSurrogate}, even though its run-time type is a specialization of that class. When serializing polymorphic class hierarchies it is important to ensure that the compile-time type of the serialized object is a polymorphic one, and not a concrete one.\newline
 
 In general, \textit{kotlinx.serialization} is designed to work correctly only when the compile-time type used during serialization is the same one as the compile-time type used during deserialization. This is not a problem, as the application that will deserialize the \kotlin{PositionSurrogate} object can always check the concrete type using the \kotlin{is} operator. A ``type" key is added to the resulting JSON object. The field is called \textit{discriminator} and it is used by the deserializer to map the object to the correct class.\newline
-
-\code{Kotlin}{listings/PositionSurrogateSerialization.kt}{Serialization of a PositionSurrogate}{positionsurroateserialization}
 
 Considering an object of type \kotlin{EnvironmentSurrogate<Any, PositionSurrogate>}, here is what happens under the hood, considering only the second type parameter (\kotlin{PS}):
 \begin{itemize}
@@ -146,21 +146,21 @@ To sum it up, by declaring \kotlin{sealed} a common interface and \kotlin{@Seria
 
 \paragraph{Concentration Surrogate (TS)} The first type parameter is harder to treat, as a closed polymorphism strategy ca not be used for serialization. The concentration of a molecule can be of any type depending on the \kotlin{Incarnation} used. In this case there is not a common interface that can be used for classes to inherit. For this motivation, \kotlin{Any} is used as upper bound of the \kotlin{TS} type parameter.\newline
 
-Since this kind of polymorphism is open, there is a possibility that subclasses are defined anywhere in the source code. This is not the case, but classes could even be declared in other modules. The list of subclasses that are serialized must be explicitly registered at run-time rather than being determined at compile-time. A \kotlin{SerializersModule} must be defined using the \kotlin{SerializersModule{}} builder function in order to make the serialization work without using the \kotlin{sealed} keyword. Each subclass must be registered using the \kotlin{subclass(Class)} function in the module. The base class is specified in the \kotlin{polymorphic} builder. By using this module, a unique JSON configuration can be created and used for serialization. \fullref{lst:serializationmodule} illustrates a possible configuration, where \kotlin{ConcentrationSurrogateMock} is a concentration class. In a real configuration, there would be more \kotlin{subclass} call, one for each concentration class that must be supported.\newline
-
-The additional configuration described, makes the code work just as it would with a \kotlin{sealed} class for the \kotlin{PS} type parameter, but in this case subclasses can be spread arbitrarily throughout the code. A default behavior was also provided. During the deserialization process, if the type is  absent or not recognized, the \kotlin{EmptyConcentrationSurrogate} is used. In other words, if a serialized JSON string does not respect the schema of any of the classes that were declared as subclasses inside the module, they will be mapped to an \kotlin{EmptyConcentrationSurrogate} object, which is basically an empty class.\newline
+Since this kind of polymorphism is open, there is a possibility that subclasses are defined anywhere in the source code. This is not the case, but classes could even be declared in other modules. The list of subclasses that are serialized must be explicitly registered at run-time rather than being determined at compile-time. A \kotlin{SerializersModule} must be defined using the \kotlin{SerializersModule{}} builder function in order to make the serialization work without using the \kotlin{sealed} keyword. Each subclass must be registered using the \kotlin{subclass(Class)} function in the module. The base class is specified in the \kotlin{polymorphic} builder. By using this module, a unique JSON configuration can be created and used for serialization. \fullref{lst:serializationmodule} illustrates a possible configuration, where \kotlin{ConcentrationSurrogateMock} is a concentration class. In a real configuration, there would be more \kotlin{subclass} call, one for each concentration class that must be supported.
 
 \code{Kotlin}{listings/SerializationModule.kt}{Module for the Serialization of Concentrations}{serializationmodule}
 
+The additional configuration described, makes the code work just as it would with a \kotlin{sealed} class for the \kotlin{PS} type parameter, but in this case subclasses can be spread arbitrarily throughout the code. A default behavior was also provided. During the deserialization process, if the type is  absent or not recognized, the \kotlin{EmptyConcentrationSurrogate} is used. In other words, if a serialized JSON string does not respect the schema of any of the classes that were declared as subclasses inside the module, they will be mapped to an \kotlin{EmptyConcentrationSurrogate} object, which is basically an empty class.\newline
+
 The serialization operation, which is shown in \fullref{lst:serializationmoduleexample}, is pretty straightforward, as it is really similar to the one already shown in \fullref{lst:positionsurroateserialization}.
-However, in this case an instance of \kotlin{PolymorphicSerializer} for the base class \kotlin{Any} must be explicitly passed as the first parameter to the \kotlin{encodeToString()} function. If the parameter is missing, a \kotlin{SerializationException} is thrown, explaining that \textit{``A Serializer for class 'Any' is not found"}.\newline
+However, in this case an instance of \kotlin{PolymorphicSerializer} for the base class \kotlin{Any} must be explicitly passed as the first parameter to the \kotlin{encodeToString()} function. If the parameter is missing, a \kotlin{SerializationException} is thrown, explaining that \textit{``A Serializer for class 'Any' is not found"}.
+
+\code{Kotlin}{listings/SerializationModuleExample.kt}{Serialization of a Concentration}{serializationmoduleexample}
 
 \begin{warn}[Polymorphic Serializers in Ktor:]
 	The JVM Server was implemented using the Ktor framework, in which it is possible to incorporate modules that instruct the server endpoints to automatically use serializers if the object to be transmitted is an instance of a serializable class. This process is similarly applicable on the client side using Ktor Client APIs.
 	By configuring some content negotiation parameters, the serialization strategy and the handling of format is completely delegated to the Ktor framework. However, a challenge arises with the \kotlin{EnvironmentSurrogate} class, which necessitates a specific Polymorphic serializer due to its two type parameters. Unfortunately, Ktor does not currently support Polymorphic serializers when it comes to content negotiation. As a result, the \kotlin{EnvironmentSurrogate} must be serialized manually before transmission. This also prohibits Ktor from dynamically selecting the format. As a possible solution, one could create a function that verifies the content negotiation strategy in use and adjusts the \kotlin{EnvironmentSurrogate} serialization API accordingly.
 \end{warn}
-
-\code{Kotlin}{listings/SerializationModuleExample.kt}{Serialization of a Concentration}{serializationmoduleexample}
 
 Now, considering an object of type \kotlin{EnvironmentSurrogate<Any, PositionSurrogate>}, here is what happens under the hood, considering only the first type parameter (\kotlin{TS}):
 \begin{itemize}
@@ -208,18 +208,18 @@ The way components are defined resembles the one used in the Typesafe HTML DSL l
 React is an excellent choice for building web applications for several reasons, one of which is the availability of a large number of npm dependencies. These dependencies provide a wealth of functionality and can save time and effort in implementing common features and functionalities. All dependencies in a Kotlin/JS projects can be managed using the Gradle plugin.\newline
 
 In the Alchemist Web Renderer project the only npm dependency for now is the \kotlin{react-bootstrap} library. \fullref{lst:npm} shows a line of code that imports library from npm\footnote{https://kotlinlang.org/docs/using-packages-from-npm.html}.
-React Bootstrap\footnote{https://react-bootstrap.github.io/} is a library that offers pre-made UI components for creating responsive web applications using the popular React.js framework. It is based on the well-known Twitter Bootstrap\footnote{https://getbootstrap.com/} library, and it is designed for speed, accessibility, and usability, as it includes a variety of elements like buttons, forms, etc.\newline
-
-It is necessary to offer some sort of adapter for Javascript functions and components. This is caused by Kotlin being a statically typed language while JavaScript modules are typically dynamically typed. Such adapters are referred to as \textit{``external declarations"} in Kotlin. The \kotlin{external} keyword is involved in the creation of an adapter. This keyword is used to declare a platform-specific implementation for a function or property that is expected to be provided by a different module.\newline
+React Bootstrap\footnote{https://react-bootstrap.github.io/} is a library that offers pre-made UI components for creating responsive web applications using the popular React.js framework. It is based on the well-known Twitter Bootstrap\footnote{https://getbootstrap.com/} library, and it is designed for speed, accessibility, and usability, as it includes a variety of elements like buttons, forms, etc.
 
 \code{Kotlin}{listings/npm.kt}{Integration of an npm dependency in Kotlin/JS}{npm}
 
-\code{Kotlin}{listings/Adapter.kt}{Adapter for the React Bootstrap Navbar API}{adapter}
+It is necessary to offer some sort of adapter for Javascript functions and components. This is caused by Kotlin being a statically typed language while JavaScript modules are typically dynamically typed. Such adapters are referred to as \textit{``external declarations"} in Kotlin. The \kotlin{external} keyword is involved in the creation of an adapter. This keyword is used to declare a platform-specific implementation for a function or property that is expected to be provided by a different module.\newline
 
-An adapter for the Navbar\footnote{https://react-bootstrap.github.io/components/navbar/\#api} component offered by the React Bootstrap library can be seen in \fullref{lst:adapter}. The \kotlin{@JsModule} annotation denotes an external declaration that must be imported from native JavaScript library while the \kotlin{@JsNonModule} annotation denotes an external declaration that can be used without module system. In this context, the \kotlin{@JsName} annotation is used because the compiler produces mangled names for functions. In this case react components are imported as \textit{``default"}. The Navbar component adapter is defined using a set of props that comes directly from the original Navbar API. An exhaustive adapter should include all the props but in this case, only the \kotlin{bg} and \kotlin{variant} props are defined. The component can be defined using the DSL notation as demonstrated in \fullref{lst:adapter-use}.\newline
+An adapter for the Navbar\footnote{https://react-bootstrap.github.io/components/navbar/\#api} component offered by the React Bootstrap library can be seen in \fullref{lst:adapter}. The \kotlin{@JsModule} annotation denotes an external declaration that must be imported from native JavaScript library while the \kotlin{@JsNonModule} annotation denotes an external declaration that can be used without module system. In this context, the \kotlin{@JsName} annotation is used because the compiler produces mangled names for functions. In this case react components are imported as \textit{``default"}. The Navbar component adapter is defined using a set of props that comes directly from the original Navbar API. An exhaustive adapter should include all the props but in this case, only the \kotlin{bg} and \kotlin{variant} props are defined. The component can be defined using the DSL notation as demonstrated in \fullref{lst:adapter-use}.
+
+\code{Kotlin}{listings/Adapter.kt}{Adapter for the React Bootstrap Navbar API}{adapter}
 
 \code{Kotlin}{listings/AdapterUse.kt}{React Bootstrap Navbar in Kotlin}{adapter-use}
 
-\centerImage{figures/UIcomponents.pdf}{UI Components Hierarchy with Adapters}{components}{0.7}
-
 The Navbar is just an example component used in the project, it is possible to create other adapters by referring to the original APIs of the various libraries' documentation. In \fullref{ssec:user-interface-components} a hierarchical structure of components was selected to define the web app structure. The same hierarchy is illustrated in \fullref{fig:components}, adorned with the lilac-shaded components that comes from the React Bootstrap library. The arrows declare a dependency of type composition.
+
+\centerImage{figures/UIcomponents.pdf}{UI Components Hierarchy with Adapters}{components}{0.9}
