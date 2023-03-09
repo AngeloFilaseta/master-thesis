@@ -31,4 +31,5 @@ how it would be possible to enrich the system with little to no changes to the p
 
 ### Useful Links
 __Context__: [The Alchemist Simulator](https://github.com/AlchemistSimulator/)
+
 __My Supervisors__: Danilo Pianini ([DanySK](https://github.com/DanySK) on GitHub) and Gianluca Aguzzi ([cric96](https://github.com/cric96) on GitHub)
